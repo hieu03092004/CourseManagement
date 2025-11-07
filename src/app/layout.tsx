@@ -4,7 +4,7 @@ import { Be_Vietnam_Pro } from "next/font/google";
 
 // CSS/global styles dùng cho toàn app
 import "./globals.css";
-import "../../public/src/assets/app.scss";
+import "../styles/app.scss";
 
 const beVietnamPro = Be_Vietnam_Pro({
   variable: "--font-be-vietnam-pro",

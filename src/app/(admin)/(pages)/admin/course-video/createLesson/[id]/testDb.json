@@ -1,0 +1,26 @@
+[
+    {
+      "courseId": 1,
+      "topic": "HTML",
+      "lessons": {
+        "title": "Lesson 1",
+        "videoUrl":"lythuyetDothi.mp4",
+        "duration": 10,
+        "orderIndex": 1
+
+      },
+      "orderIndex": 1
+    },
+    {
+        "courseId": 1,
+        "topic": "HTML",
+        "lessons": {
+          "title": "Lesson 1",
+          "videoUrl":"video1.mp4",
+          "duration": 10,
+          "orderIndex": 1
+  
+        },
+        "orderIndex": 1
+    }
+]

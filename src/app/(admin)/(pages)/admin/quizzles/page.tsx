@@ -145,13 +145,6 @@ export default function QuizzlesPage() {
         sx={{ mb: 3 }}
       >
         <Typography variant="h4">Quản lý bài quiz</Typography>
-        <Button
-          variant="contained"
-          startIcon={<AddIcon />}
-          onClick={handleAddQuiz}
-        >
-          Thêm bài quiz
-        </Button>
       </Stack>
 
       <Filter

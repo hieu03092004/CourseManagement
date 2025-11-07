@@ -15,6 +15,7 @@ module.exports = {
         primary: "var(--color-primary)",
         secondary: "var(--color-secondary)",
         white: "var(--color-white)", // có sẵn trong Tailwind, nhưng map lại cũng không sao
+        primaryAdmin: "var(--color-main-admin)",
       },
     },
   },

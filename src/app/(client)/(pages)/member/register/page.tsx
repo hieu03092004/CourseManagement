@@ -1,6 +1,7 @@
 "use client"
 import { useState } from 'react';
 import React from 'react';
+import Link from 'next/link';
 
 type SvgProps = React.ComponentProps<'svg'>;
 
@@ -36,11 +37,11 @@ export default function RegisterPage() {
       <nav className="self-start px-4 md:px-16 text-sm text-gray-700">
         <ul className="flex space-x-2">
           <li>
-            <a href="#" className="hover:underline text-blue-600">Trang chủ</a>
+            <Link href="/" className="hover:underline text-blue-600">Trang chủ</Link>
           </li>
           <li>•</li>
           <li>
-            <a href="#" className="hover:underline text-blue-600">Tài khoản thành viên</a>
+            <Link href="/member" className="hover:underline text-blue-600">Tài khoản thành viên</Link>
           </li>
         </ul>
       </nav>
@@ -214,9 +215,9 @@ export default function RegisterPage() {
 
         <p className="mt-6 text-center text-base text-gray-600">
           Bạn đã có tài khoản?{' '}
-          <a href="./login" className="font-semibold text-blue-600 hover:text-blue-500 hover:underline">
+          <Link href="/member/login" className="font-semibold text-blue-600 hover:text-blue-500 hover:underline">
             Đăng nhập
-          </a>
+          </Link>
         </p>
       </div>
     </div>

@@ -1,8 +1,37 @@
 "use client"
 import { useState } from 'react';
 import React from 'react';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { setCookie } from '@/app/(client)/helpers/cookie';
+import { checkLogin } from '@/app/(client)/actions';
+import { useDispatch } from 'react-redux';
 
 type SvgProps = React.ComponentProps<'svg'>;
+
+// Mock login function - trả về data fix cứng
+const login = (email: string, password: string) => {
+  // Giả lập check login với data cứng
+  const mockUsers = [
+    {
+      id: "1",
+      email: "admin@example.com",
+      password: "123456",
+      fullName: "Nguyen Van A",
+      token: "mock-token-123"
+    },
+    {
+      id: "2",
+      email: "user@example.com",
+      password: "123456",
+      fullName: "Tran Thi B",
+      token: "mock-token-456"
+    }
+  ];
+
+  const user = mockUsers.find(u => u.email === email && u.password === password);
+  return user ? [user] : [];
+};
 
 const EyeIcon = (props: SvgProps) => (
   <svg {...props} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -21,6 +50,28 @@ const EyeOffIcon = (props: SvgProps) => (
 
 export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
+  const router=useRouter();
+  const dispatch=useDispatch();
+  const handleSubmit=(e:React.FormEvent<HTMLFormElement>)=>{
+    e.preventDefault();
+    const email=(e.target as HTMLFormElement).email.value;
+    const password=(e.target as HTMLFormElement).password.value;
+    const response= login(email,password);
+    console.log(response);
+    if(response.length>0){
+        router.push("/");
+        setCookie("id",response[0].id,1);
+        setCookie("fullName",response[0].fullName,1);
+        setCookie("email",response[0].email,1);
+        setCookie("token",response[0].token,1);
+        dispatch(checkLogin(true));
+    }
+    else{
+        alert("Tài khoản hoặc mật khẩu không chính xác");
+    }
+
+
+}
   
   const inputClass = "block w-full pl-10 pr-10 py-2.5 text-base border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out";
 
@@ -31,11 +82,11 @@ export default function LoginPage() {
       <nav className="self-start px-4 md:px-16 text-sm text-gray-700">
         <ul className="flex space-x-2">
           <li>
-            <a href="#" className="hover:underline text-blue-600">Trang chủ</a>
+            <Link href="/" className="hover:underline text-blue-600">Trang chủ</Link>
           </li>
           <li>•</li>
           <li>
-            <a href="#" className="hover:underline text-blue-600">Tài khoản thành viên</a>
+            <Link href="/member" className="hover:underline text-blue-600">Tài khoản thành viên</Link>
           </li>
         </ul>
       </nav>
@@ -43,10 +94,10 @@ export default function LoginPage() {
       <div className="w-full max-w-lg mt-4 p-5 md:p-8 bg-white shadow-xl rounded-xl border border-gray-100">
         <h2 className="text-4xl font-bold text-gray-800 mb-8 text-center">Đăng nhập</h2>
 
-        <form className="space-y-6">
+        <form className="space-y-6" onSubmit={handleSubmit} method="post" action="/member/login">
           <div>
-            <label htmlFor="account" className={labelClass}>
-              Tài khoản
+            <label htmlFor="email" className={labelClass}>
+              Email
             </label>
             <div className="mt-1 relative rounded-lg shadow-sm">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -55,11 +106,11 @@ export default function LoginPage() {
                 </svg>
               </div>
               <input
-                type="text"
-                name="account"
-                id="account"
+                type="email"
+                name="email"
+                id="email"
                 className={inputClass.replace('pr-10', 'pr-4')}
-                placeholder="Ví dụ: nhuthuy"
+                placeholder="Ví dụ: admin@example.com"
               />
             </div>
           </div>
@@ -96,9 +147,9 @@ export default function LoginPage() {
           </div>
 
           <div className="text-right text-sm">
-            <a href="./forgot-password" className="font-medium text-blue-600 hover:text-blue-500 hover:underline">
+            <Link href="/member/forgot-password" className="font-medium text-blue-600 hover:text-blue-500 hover:underline">
               Quên mật khẩu?
-            </a>
+            </Link>
           </div>
 
 
@@ -115,9 +166,9 @@ export default function LoginPage() {
 
         <p className="mt-6 text-center text-base text-gray-600">
           Bạn chưa có tài khoản?{' '}
-          <a href="./register" className="font-semibold text-blue-600 hover:text-blue-500 hover:underline">
+          <Link href="/member/register" className="font-semibold text-blue-600 hover:text-blue-500 hover:underline">
             Đăng ký ngay
-          </a>
+          </Link>
         </p>
       </div>
     </div>

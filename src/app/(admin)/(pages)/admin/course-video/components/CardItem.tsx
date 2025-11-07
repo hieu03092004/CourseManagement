@@ -10,6 +10,7 @@ import {
 } from "@mui/material";
 import { FaStar, FaBook, FaUser } from "react-icons/fa6";
 import { Course } from "../../interfaces/course";
+import Link from "next/link";
 
 interface CardItemProps {
   course: Course;
@@ -116,10 +117,19 @@ const CardItem: React.FC<CardItemProps> = ({ course }) => {
         </Box>
       </CardContent>
       <CardActions>
-        <Button size="small">Xem chi tiết</Button>
-        <Button size="small" color="primary">
-          Chỉnh sửa
-        </Button>
+        <Link href={`/admin/course-video/details/${course.id}`} passHref>
+          <Button size="small">Xem chi tiết</Button>
+        </Link>
+        <Link href={`/admin/course-video/edit/${course.id}`} passHref>
+          <Button size="small" color="primary">
+            Chỉnh sửa
+          </Button>
+        </Link>
+        <Link href={`/admin/course-video/createLesson/${course.id}`} passHref>
+          <Button size="small" color="primary">
+            Thêm bài giảng
+          </Button>
+        </Link>
       </CardActions>
     </Card>
   );
