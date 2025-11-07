@@ -1,23 +1,19 @@
+"use client";
 // src/app/(client)/layout.tsx
 
-// Nếu Header/Footer là client component (có "use client"), 
-// file này vẫn có thể là server component – Next sẽ tự xử lý.
 import Header from "./components/Header/Header";
 import Footer from "./components/Footer/Footer";
+import allReducers from './reducers';
+import {createStore} from "redux";
+import {Provider} from "react-redux";
 
-export const metadata = {
-  title: {
-    default: "Course Management",
-    template: "%s | Course Management",
-  },
-  description: "Course Management",
-};
+const store = createStore(allReducers);
 
 export default function ClientLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <>
+    <Provider store={store}>
       {/* Header cố định của client */}
       <Header />
 
@@ -27,6 +23,6 @@ export default function ClientLayout({
       </main>
 
       <Footer />
-    </>
+    </Provider>
   );
 }

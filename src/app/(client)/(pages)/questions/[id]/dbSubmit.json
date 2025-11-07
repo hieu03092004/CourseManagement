@@ -1,0 +1,9 @@
+{
+    "quizId": 123,
+    "userId": 45,
+    "answers": [
+      { "questionId": 1001, "choice": 2 },
+      { "questionId": 1002, "choice": 1 },
+      { "questionId": 1003, "choice": 4 }
+    ]
+  }

@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { Typography, Button, Stack, Box } from "@mui/material";
 import { Add as AddIcon } from "@mui/icons-material";
+import Link from "next/link";
 import Filter from "./components/Filter";
 import CardList from "./components/CardList";
 import { Course } from "../interfaces/course";
@@ -142,9 +143,11 @@ const CoursesPage = () => {
         sx={{ mb: 3 }}
       >
         <Typography variant="h4">Danh sách khóa học</Typography>
-        <Button variant="contained" startIcon={<AddIcon />}>
-          Thêm khóa học
-        </Button>
+        <Link href="/admin/course-video/create" passHref>
+          <Button variant="contained" startIcon={<AddIcon />}>
+            Thêm khóa học
+          </Button>
+        </Link>
       </Stack>
 
       <Filter

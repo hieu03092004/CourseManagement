@@ -1,58 +1,69 @@
 import Link from "next/link";
 import { FaBook, FaCalendar, FaClock, FaStar, FaUser } from "react-icons/fa6";
-export default function CardItem() {
+import { ICourse } from "../../interfaces/ICourse";
+
+interface CardItemProps {
+  course: ICourse;
+}
+
+export default function CardItem({ course }: CardItemProps) {
+  const renderStars = () => {
+    return Array.from({ length: 5 }).map((_, index) => (
+      <FaStar
+        key={index}
+        className={`text-[13px] ${index < course.rating ? 'text-[#FF9747]' : 'text-gray-300'}`}
+      />
+    ));
+  };
+
   return (
     <>
-      {" "}
       <Link href="/">
         <div className="bg-white rounded-[10px]">
           <div className="">
             <img
-              src="/src/assets/images/course_img_demo.png"
+              src={course.image}
               className="rounded-tr-[5px] rounded-tl-[5px]"
-            ></img>
+              alt={course.title}
+            />
           </div>
           <div className="px-[25px] py-[20px] rounded-bl-[10px] rounded-br-[10px]">
             <div className="card_review mb-[10px] flex justify-start">
               <div className="flex justify-start">
-                <FaStar className="text-[13px] text-[#FF9747]" />
-                <FaStar className="text-[13px] text-[#FF9747]" />
-                <FaStar className="text-[13px] text-[#FF9747]" />
-                <FaStar className="text-[13px] text-[#FF9747]" />
-                <FaStar className="text-[13px] text-[#FF9747]" />
+                {renderStars()}
               </div>
-              <span className="text-[14px] font-[500]">(350 đánh giá)</span>
+              <span className="text-[14px] font-[500]">({course.reviewCount} đánh giá)</span>
             </div>
             <div className="card_title">
               <h4 className="text-[18px] font-[700] mb-[15px] text-primary">
-                Lập trình node JS
+                {course.title}
               </h4>
               <div className="mb-[14px]">
                 <ul>
                   <li className="text-[13px] my-[10px] flex justify-start text-body">
                     <FaBook className="mr-[5px] text-secondary" />
-                    <strong className="mr-[5px]">50</strong>
+                    <strong className="mr-[5px]">{course.lectureCount}</strong>
                     <span>Bài Giảng</span>
                   </li>
                   <li className="text-[13px] my-[10px] flex justify-start text-body">
                     <FaUser className="text-secondary mr-[5px]" />
-                    <strong className="mr-[5px]">36</strong>
+                    <strong className="mr-[5px]">{course.studentCount}</strong>
                     <span>Học viên</span>
                   </li>
                   <li className="text-[13px] my-[10px] flex justify-start text-body">
                     <FaCalendar className="text-secondary mr-[5px]" />
                     <span className="mr-[5px]">Khai giảng</span>
-                    <strong>29/10/2025</strong>
+                    <strong>{course.startDate}</strong>
                   </li>
                   <li className="text-[13px] my-[10px] flex justify-start text-body">
                     <FaCalendar className="text-secondary mr-[5px]" />
                     <span className="mr-[5px]">Lịch học</span>
-                    <strong>Thứ 2,Thứ 4,Thứ 6</strong>
+                    <strong>{course.schedule}</strong>
                   </li>
                   <li className="text-[13px] my-[10px] flex justify-start text-body">
                     <FaClock className="text-secondary mr-[5px]" />
                     <span className="mr-[5px]">Giờ học</span>
-                    <strong>21h-23h</strong>
+                    <strong>{course.time}</strong>
                   </li>
                 </ul>
               </div>
@@ -60,21 +71,22 @@ export default function CardItem() {
                 <div className="">
                   <img
                     className="max-w-[40px] w-[40px] height-[40px] object-cover rounded-full border-2 border-primary__opacity pd-[2px]"
-                    src="/src/assets/images/avatar_demo.png"
-                  ></img>
+                    src={course.instructorAvatar}
+                    alt={course.instructorName}
+                  />
                 </div>
                 <div className="text-[13px] font-[500] text-heading">
-                  Đội ngũ 28 Tech
+                  {course.instructorName}
                 </div>
               </div>
               <div className="card_botttom">
                 <div className="price">
                   <span className="text-[16px] font-[700] text-main">
-                    7,000,000
+                    {course.price.toLocaleString('vi-VN')}
                   </span>
                   <span className="text-[16px] font-[700] text-main">đ</span>
                   <span className="text-[14px] ml-[8px] font-[600] text-black line-through opacity-50">
-                    14,000,000
+                    {course.originalPrice.toLocaleString('vi-VN')}
                     <span className="currency-symbol">đ</span>
                   </span>
                 </div>

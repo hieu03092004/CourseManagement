@@ -1,0 +1,36 @@
+{
+    "userId": 5,
+    "lessonId": 1,
+    "answers": [
+      {
+        "questionId": 1,
+        "userAnswer": 1
+      },
+      {
+        "questionId": 2,
+        "userAnswer": 1
+      },
+      {
+        "questionId": 3,
+        "userAnswer": 1
+      },
+      {
+        "questionId": 4,
+        "userAnswer": 1
+      },
+      {
+        "questionId": 5,
+        "userAnswer": 1
+      },
+      {
+        "questionId": 6,
+        "userAnswer": 1
+      },
+      {
+        "questionId": 7,
+        "userAnswer": 1
+      }
+    ],
+    "id": 15
+  }
+  

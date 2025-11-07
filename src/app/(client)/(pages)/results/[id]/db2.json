@@ -1,0 +1,84 @@
+[
+    {
+      "id": 1,
+      "quizId": 1,
+      "question": "HTML là viết tắt của...?",
+      "answers": [
+        "Hyperlinks and Text Markup Language",
+        "Home Tool Markup Language",
+        "Hyper Text Markup Language"
+      ],
+      "correctAnswer": 2
+    },
+    {
+      "id": 2,
+      "quizId": 1,
+      "question": "Ai là người đưa ra các tiêu chuẩn Web?",
+      "answers": [
+        "Tổ chức World Wide Web Consortium (W3C)",
+        "Apple",
+        "Google",
+        "Microsoft"
+      ],
+      "correctAnswer": 0
+    },
+    {
+      "id": 3,
+      "quizId": 1,
+      "question": "Thẻ nào dùng để nhúng video trong HTML5?",
+      "answers": [
+        "<video>",
+        "<media>",
+        "<movie>"
+      ],
+      "correctAnswer": 0
+    },
+    {
+      "id": 4,
+      "quizId": 1,
+      "question": "Thuộc tính nào của phần tử media cho phép phát tự động?",
+      "answers": [
+        "controls",
+        "autoplay",
+        "loop",
+        "muted"
+      ],
+      "correctAnswer": 1
+    },
+    {
+      "id": 5,
+      "quizId": 1,
+      "question": "API nào của HTML5 hỗ trợ lưu trữ key‑value đồng bộ phía client?",
+      "answers": [
+        "Web SQL Database",
+        "IndexedDB",
+        "localStorage",
+        "Service Worker"
+      ],
+      "correctAnswer": 2
+    },
+    {
+      "id": 6,
+      "quizId": 1,
+      "question": "Phần tử nào định nghĩa nội dung tự chứa, độc lập (ví dụ một bài viết)?",
+      "answers": [
+        "<section>",
+        "<article>",
+        "<aside>",
+        "<div>"
+      ],
+      "correctAnswer": 1
+    },
+    {
+      "id": 7,
+      "quizId": 1,
+      "question": "Thuộc tính nào của thẻ <input> dùng để hiển thị bộ chọn ngày?",
+      "answers": [
+        "type=\"date\"",
+        "type=\"datetime\"",
+        "type=\"calendar\"",
+        "type=\"time\""
+      ],
+      "correctAnswer": 0
+    }
+  ]

@@ -5,7 +5,7 @@ export default function Footer() {
     return (
         <footer>
             <div className="footer__form">
-                <div className="container max-w-[960px] mx-auto">
+                <div className="container w-full">
                     <FooterForm/>
                 </div>
             </div>
