@@ -8,17 +8,34 @@ import {
 import { useState } from "react";
 import { FaCirclePlay } from "react-icons/fa6";
 
-function LessonItem() {
+interface Lesson {
+  title: string;
+  videoUrl: string;
+  duration: number;
+  orderIndex: number;
+}
+
+type Props = {
+  lesson: Lesson;
+};
+
+function formatDuration(seconds: number): string {
+  const mins = Math.floor(seconds / 60);
+  const secs = seconds % 60;
+  return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+}
+
+function LessonItem({ lesson }: Props) {
   const [modalOpen, setModalOpen] = useState(false);
 
   return (
     <>
-      <li className="lesson-item flex text-[14px] py-2 ps-2 border-b border-gray-300 last:border-b-0 ;">
+      <li className="lesson-item flex justify-between text-[14px] py-2 ps-2 border-b border-gray-300 last:border-b-0 ;">
         <div className="lesson-item-title flex gap-2 items-center me-[150px]">
           <FaCirclePlay />
-          <span>Bài 1. Hướng dẫn cài đặt phần mềm DEV C++ để lập trình</span>
+          <span>{lesson.title}</span>
         </div>
-        <div className="flex gap-4 pe-[20px]">
+        <div className="flex gap-4">
           <div className="lesson-item-watch">
             <button
               className="underline decoration-sky-500 text-sky-500/100"
@@ -27,7 +44,7 @@ function LessonItem() {
               Vào học
             </button>
           </div>
-          <div className="lesson-item-duration">03:01</div>
+          <div className="lesson-item-duration">{formatDuration(lesson.duration)}</div>
         </div>
       </li>
 
@@ -42,7 +59,7 @@ function LessonItem() {
           <DialogPanel className="w-full  bg-white rounded-md shadow-lg overflow-hidden">
             <div className="flex items-center justify-between p-4 border-b">
               <DialogTitle className="text-lg font-semibold">
-                Bài 1. Hướng dẫn cài đặt phần mềm DEV C++
+                {lesson.title}
               </DialogTitle>
               <button
                 onClick={() => setModalOpen(false)}
@@ -54,7 +71,7 @@ function LessonItem() {
 
             <div className="bg-black">
               <video controls className="w-full h-[600px] bg-black">
-                <source src="/demo/sample.mp4" type="video/mp4" />
+                <source src={lesson.videoUrl} type="video/mp4" />
                 Trình duyệt của bạn không hỗ trợ thẻ video.
               </video>
             </div>

@@ -1,10 +1,28 @@
 "use client";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { FaStarHalfAlt } from "react-icons/fa";
 import { FaRegStar, FaStar } from "react-icons/fa6";
 import { LiaComment } from "react-icons/lia";
 
-type props = { rating: number };
+interface Review {
+  userName: string;
+  comment: string;
+  rating: number;
+}
+
+type props = {
+  rating: number;
+  reviews: Review[];
+};
+
+function getInitials(name: string) {
+  return name
+    .split(' ')
+    .map(word => word[0])
+    .join('')
+    .toUpperCase()
+    .slice(0, 3);
+}
 
 function FormInner() {
   const [ratingValue, setRatingValue] = useState(5);
@@ -26,9 +44,7 @@ function FormInner() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!validate()) return;
-    // submit data (placeholder)
     console.log({ ratingValue, comment, name, phone, email });
-    // reset
     setComment("");
     setName("");
     setPhone("");
@@ -139,8 +155,36 @@ function FormInner() {
     </form>
   );
 }
-export default function ({ rating }: props) {
+
+export default function ({ rating, reviews }: props) {
   const [formOpen, setFormOpen] = useState(false);
+
+  const ratingBreakdown = useMemo(() => {
+    const total = reviews.length;
+    if (total === 0) return [
+      { stars: 5, percent: 0 },
+      { stars: 4, percent: 0 },
+      { stars: 3, percent: 0 },
+      { stars: 2, percent: 0 },
+      { stars: 1, percent: 0 },
+    ];
+
+    const counts = { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 };
+    reviews.forEach(review => {
+      const roundedRating = Math.round(review.rating) as 1 | 2 | 3 | 4 | 5;
+      if (roundedRating >= 1 && roundedRating <= 5) {
+        counts[roundedRating]++;
+      }
+    });
+
+    return [
+      { stars: 5, percent: Math.round((counts[5] / total) * 100) },
+      { stars: 4, percent: Math.round((counts[4] / total) * 100) },
+      { stars: 3, percent: Math.round((counts[3] / total) * 100) },
+      { stars: 2, percent: Math.round((counts[2] / total) * 100) },
+      { stars: 1, percent: Math.round((counts[1] / total) * 100) },
+    ];
+  }, [reviews]);
 
   return (
     <>
@@ -164,14 +208,7 @@ export default function ({ rating }: props) {
             </span>
           </div>
           <div className="w-2/4 py-[20px] px-[10px] ">
-            {/** Example rating breakdown data - replace with real values if available */}
-            {[
-              { stars: 5, percent: 99 },
-              { stars: 4, percent: 0 },
-              { stars: 3, percent: 0 },
-              { stars: 2, percent: 0 },
-              { stars: 1, percent: 0 },
-            ].map((r) => (
+            {ratingBreakdown.map((r) => (
               <div key={r.stars} className="flex items-center gap-3 mb-2">
                 <div className="flex items-center w-14 text-sm text-gray-700">
                   <span className="w-6 text-right mr-2">{r.stars}</span>
@@ -209,134 +246,42 @@ export default function ({ rating }: props) {
               : "max-h-0 opacity-0 -translate-y-2 pointer-events-none"
           }`}
         >
-          {/* Full interactive form with client-side validation */}
           <FormInner />
         </div>
         <div className="comment-section mt-1">
-          <div className="comment-item flex py-8 border-b border-gray-300 last:border-b-0">
-            <div className="w-1/5 in4-comment flex flex-col text-[13px] justify-between items-center">
-              <span className="w-[50px] rounded-[50%] bg-sky-500 h-[50px] text-center leading-[53px] text-white ">
-                NTD
-              </span>
-              <span className="font-[600] mt-1 text-primary">
-                Nguyễn Tiến Dũng
-              </span>
-              <span className="italic text-primary">16 ngày trước</span>
+          {reviews.map((review, index) => (
+            <div key={index} className="comment-item flex py-8 border-b border-gray-300 last:border-b-0">
+              <div className="w-1/5 in4-comment flex flex-col text-[13px] justify-between items-center">
+                <span className="w-[50px] rounded-[50%] bg-sky-500 h-[50px] text-center leading-[53px] text-white ">
+                  {getInitials(review.userName)}
+                </span>
+                <span className="font-[600] mt-1 text-primary">
+                  {review.userName}
+                </span>
+                <span className="italic text-primary">16 ngày trước</span>
+              </div>
+              <div className="w-4/5 flex flex-col">
+                <span className=" flex gap-1 text-yellow-500 text-[14px]">
+                  {[1, 2, 3, 4, 5].map((i) =>
+                    review.rating >= i ? (
+                      <FaStar className="" key={i} />
+                    ) : review.rating >= i - 0.5 ? (
+                      <FaStarHalfAlt key={i} />
+                    ) : (
+                      <FaRegStar key={i} />
+                    )
+                  )}
+                </span>
+                <span className="detail-comment text-[14px] mt-2 font-[400]">
+                  {review.comment}
+                </span>
+                <span className="flex items-center gap-1 text-[13px] font-[600] ">
+                  <LiaComment />
+                  Trả lời
+                </span>
+              </div>
             </div>
-            <div className="w-4/5 flex flex-col">
-              <span className=" flex gap-1 text-yellow-500 text-[14px]">
-                {[1, 2, 3, 4, 5].map((i) =>
-                  rating >= i ? (
-                    <FaStar className="" key={i} />
-                  ) : rating >= i - 0.5 ? (
-                    <FaStarHalfAlt key={i} />
-                  ) : (
-                    <FaRegStar key={i} />
-                  )
-                )}
-              </span>
-              <span className="detail-comment text-[14px] mt-2 font-[400]">
-                Khoá học chất lượng, cám ơn team 28tech!!
-              </span>
-              <span className="flex items-center gap-1 text-[13px] font-[600] ">
-                <LiaComment />
-                Trả lời
-              </span>
-            </div>
-          </div>
-          <div className="comment-item flex py-8 border-b border-gray-300 last:border-b-0">
-            <div className="w-1/5 in4-comment flex flex-col text-[13px] justify-between items-center">
-              <span className="w-[50px] rounded-[50%] bg-sky-500 h-[50px] text-center leading-[53px] text-white ">
-                NTD
-              </span>
-              <span className="font-[600] mt-1 text-primary">
-                Nguyễn Tiến Dũng
-              </span>
-              <span className="italic text-primary">16 ngày trước</span>
-            </div>
-            <div className="w-4/5 flex flex-col">
-              <span className=" flex gap-1 text-yellow-500 text-[14px]">
-                {[1, 2, 3, 4, 5].map((i) =>
-                  rating >= i ? (
-                    <FaStar className="" key={i} />
-                  ) : rating >= i - 0.5 ? (
-                    <FaStarHalfAlt key={i} />
-                  ) : (
-                    <FaRegStar key={i} />
-                  )
-                )}
-              </span>
-              <span className="detail-comment text-[14px] mt-2 font-[400]">
-                Khoá học chất lượng, cám ơn team 28tech!!
-              </span>
-              <span className="flex items-center gap-1 text-[13px] font-[600] ">
-                <LiaComment />
-                Trả lời
-              </span>
-            </div>
-          </div>
-          <div className="comment-item flex py-8 border-b border-gray-300 last:border-b-0">
-            <div className="w-1/5 in4-comment flex flex-col text-[13px] justify-between items-center">
-              <span className="w-[50px] rounded-[50%] bg-sky-500 h-[50px] text-center leading-[53px] text-white ">
-                NTD
-              </span>
-              <span className="font-[600] mt-1 text-primary">
-                Nguyễn Tiến Dũng
-              </span>
-              <span className="italic text-primary">16 ngày trước</span>
-            </div>
-            <div className="w-4/5 flex flex-col">
-              <span className=" flex gap-1 text-yellow-500 text-[14px]">
-                {[1, 2, 3, 4, 5].map((i) =>
-                  rating >= i ? (
-                    <FaStar className="" key={i} />
-                  ) : rating >= i - 0.5 ? (
-                    <FaStarHalfAlt key={i} />
-                  ) : (
-                    <FaRegStar key={i} />
-                  )
-                )}
-              </span>
-              <span className="detail-comment text-[14px] mt-2 font-[400]">
-                Khoá học chất lượng, cám ơn team 28tech!!
-              </span>
-              <span className="flex items-center gap-1 text-[13px] font-[600] ">
-                <LiaComment />
-                Trả lời
-              </span>
-            </div>
-          </div>
-          <div className="comment-item flex py-8 border-b border-gray-300 last:border-b-0">
-            <div className="w-1/5 in4-comment flex flex-col text-[13px] justify-between items-center">
-              <span className="w-[50px] rounded-[50%] bg-sky-500 h-[50px] text-center leading-[53px] text-white ">
-                NTD
-              </span>
-              <span className="font-[600] mt-1 text-primary">
-                Nguyễn Tiến Dũng
-              </span>
-              <span className="italic text-primary">16 ngày trước</span>
-            </div>
-            <div className="w-4/5 flex flex-col">
-              <span className=" flex gap-1 text-yellow-500 text-[14px]">
-                {[1, 2, 3, 4, 5].map((i) =>
-                  rating >= i ? (
-                    <FaStar className="" key={i} />
-                  ) : rating >= i - 0.5 ? (
-                    <FaStarHalfAlt key={i} />
-                  ) : (
-                    <FaRegStar key={i} />
-                  )
-                )}
-              </span>
-              <span className="detail-comment text-[14px] mt-2 font-[400]">
-                Khoá học chất lượng, cám ơn team 28tech!!
-              </span>
-              <span className="flex items-center gap-1 text-[13px] font-[600] ">
-                <LiaComment />
-                Trả lời
-              </span>
-            </div>
-          </div>
+          ))}
         </div>
       </div>
     </>

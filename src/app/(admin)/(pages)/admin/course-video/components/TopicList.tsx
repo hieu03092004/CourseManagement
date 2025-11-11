@@ -1,6 +1,7 @@
-import ChapterItem from "./ChapterItem";
+import TopicItem from "./TopicItem";
 
 interface Lesson {
+  id: number;
   title: string;
   videoUrl: string;
   duration: number;
@@ -17,15 +18,15 @@ type Props = {
   topics: Topic[];
 };
 
-function ChapterList({ topics }: Props) {
+function TopicList({ topics }: Props) {
   return (
     <>
-      <div className="chapter-list">
+      <div className="chapter-list w-[full] pt-[30px]">
         {topics.map((topic, index) => (
-          <ChapterItem key={index} topic={topic} />
+          <TopicItem key={index} topic={topic} />
         ))}
       </div>
     </>
   );
 }
-export default ChapterList;
+export default TopicList;
