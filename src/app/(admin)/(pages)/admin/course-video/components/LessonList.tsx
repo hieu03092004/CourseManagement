@@ -1,6 +1,7 @@
 import LessonItem from "./LessonItem";
 
 interface Lesson {
+  id: number;
   title: string;
   videoUrl: string;
   duration: number;

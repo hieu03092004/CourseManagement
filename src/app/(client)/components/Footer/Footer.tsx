@@ -5,7 +5,7 @@ export default function Footer() {
     return (
         <footer>
             <div className="footer__form">
-                <div className="container w-full">
+                <div className="w-full">
                     <FooterForm/>
                 </div>
             </div>

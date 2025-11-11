@@ -1,9 +1,10 @@
 "use client";
 import { useState } from "react";
 import { IoMdArrowDropdownCircle } from "react-icons/io";
-import LessonList from "../Lesson/LessonList";
+import LessonList from "./LessonList";
 
 interface Lesson {
+  id: number;
   title: string;
   videoUrl: string;
   duration: number;
@@ -20,7 +21,7 @@ type Props = {
   topic: Topic;
 };
 
-function ChapterItem({ topic }: Props) {
+function TopicItem({ topic }: Props) {
   const [collapsed, setCollapsed] = useState(false);
 
   const toggleCollapse = () => {
@@ -29,11 +30,11 @@ function ChapterItem({ topic }: Props) {
 
   return (
     <>
-      <div className="chapter-item px-[8] mb-1">
+      <div className="chapter-item  mb-1">
         <div className="chapter-title bg-sky-500/100 p-[5px] text-[14px] flex justify-between text-white font-medium">
           <span>{topic.title.toUpperCase()}</span>
           <div className="flex items-center gap-4">
-            <span className="me-[10px]">Timeline</span>
+            <span className="me-[10px]">Hành động</span>
             <button type="button" onClick={toggleCollapse} className="cursor-pointer min-w-[21px]">
               <IoMdArrowDropdownCircle
                 className={` cursor-pointer ${
@@ -50,4 +51,4 @@ function ChapterItem({ topic }: Props) {
     </>
   );
 }
-export default ChapterItem;
+export default TopicItem;

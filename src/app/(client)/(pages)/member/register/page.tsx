@@ -2,7 +2,8 @@
 import { useState } from 'react';
 import React from 'react';
 import Link from 'next/link';
-
+import { post } from '../../../../(admin)/ultils/request';
+import { useRouter } from 'next/navigation';
 type SvgProps = React.ComponentProps<'svg'>;
 
 const EyeIcon = (props: SvgProps) => (
@@ -23,6 +24,15 @@ const EyeOffIcon = (props: SvgProps) => (
 export default function RegisterPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const router=useRouter();
+  const [formData, setFormData] = useState({
+    fullName: '',
+    userName: '',
+    email: '',
+    phone: '',
+    password: '',
+    confirmPassword: ''
+  });
 
   // Base class (pr-4 for non-password fields)
   const baseInputClass = "block w-full pl-10 pr-4 py-2.5 text-base border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out";
@@ -31,6 +41,54 @@ export default function RegisterPage() {
   const passwordInputClass = "block w-full pl-10 pr-10 py-2.5 text-base border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out";
 
   const labelClass = "block text-base font-medium text-gray-700 after:content-['*'] after:ml-0.5 after:text-red-500";
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    let resgiterStatus = true;
+
+    if (formData.password !== formData.confirmPassword) {
+      alert('Mật khẩu xác nhận không chính xác');
+      // resgiterStatus = false;
+      return;
+    }
+
+    const dataToSend = {
+      fullName: formData.fullName,
+      userName: formData.userName,
+      email: formData.email,
+      phone: formData.phone,
+      passwordHash: formData.password
+    };
+
+    try {
+      //console.log(dataToSend);
+      resgiterStatus=true;
+      if(resgiterStatus){
+        router.push('/member/login');
+      }
+      // const result = await post('api/register', dataToSend);
+
+      // if (result.success || result.id) {
+      //   console.log('Registration successful:', result);
+      //   alert('Đăng ký thành công!');
+      // } else {
+      //   console.error('Registration failed:', result);
+      //   alert('Đăng ký thất bại: ' + (result.message || 'Lỗi không xác định'));
+      // }
+    } catch (error) {
+      console.error('Error during registration:', error);
+      alert('Đã xảy ra lỗi khi đăng ký');
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col items-center pt-4 md:pt-8">
@@ -49,7 +107,7 @@ export default function RegisterPage() {
       <div className="w-full max-w-xl mt-4 p-5 md:p-8 bg-white shadow-xl rounded-xl border border-gray-100">
         <h2 className="text-4xl font-bold text-gray-800 mb-8 text-center">Đăng ký</h2>
 
-        <form className="space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <label htmlFor="name" className={labelClass}>
@@ -63,11 +121,12 @@ export default function RegisterPage() {
                 </div>
                 <input
                   type="text"
-                  name="name"
+                  name="fullName"
                   id="name"
                   className={baseInputClass}
-                  placeholder="Nguyen Van A"
-                  defaultValue="Nguyen Van A"
+                  placeholder="Họ và tên"
+                  value={formData.fullName}
+                  onChange={handleInputChange}
                 />
               </div>
             </div>
@@ -84,11 +143,12 @@ export default function RegisterPage() {
                 </div>
                 <input
                   type="text"
-                  name="account"
+                  name="userName"
                   id="account"
                   className={baseInputClass}
-                  placeholder="nguyenvanana"
-                  defaultValue="nguyenvanana"
+                  placeholder="Tài khoản"
+                  value={formData.userName}
+                  onChange={handleInputChange}
                 />
               </div>
             </div>
@@ -110,8 +170,9 @@ export default function RegisterPage() {
                   name="email"
                   id="email"
                   className={baseInputClass}
-                  placeholder="nhuthuy@gmail.com"
-                  defaultValue="nhuthuy@gmail.com"
+                  placeholder="example@gmail.com"
+                  value={formData.email}
+                  onChange={handleInputChange}
                 />
               </div>
             </div>
@@ -132,7 +193,8 @@ export default function RegisterPage() {
                   id="phone"
                   className={baseInputClass}
                   placeholder="0987654321"
-                  defaultValue="0987654321"
+                  value={formData.phone}
+                  onChange={handleInputChange}
                 />
               </div>
             </div>
@@ -154,7 +216,8 @@ export default function RegisterPage() {
                   name="password"
                   id="password"
                   className={passwordInputClass}
-                  defaultValue="password_placeholder"
+                  value={formData.password}
+                  onChange={handleInputChange}
                 />
                 <button
                   type="button"
@@ -185,7 +248,8 @@ export default function RegisterPage() {
                   name="confirmPassword"
                   id="confirmPassword"
                   className={passwordInputClass}
-                  defaultValue="password_placeholder"
+                  value={formData.confirmPassword}
+                  onChange={handleInputChange}
                 />
                 <button
                   type="button"

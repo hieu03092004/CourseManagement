@@ -18,7 +18,7 @@ export default function CardItem({ course }: CardItemProps) {
 
   return (
     <>
-      <Link href="/">
+      <Link href={`/course/${course.id}`}>
         <div className="bg-white rounded-[10px]">
           <div className="">
             <img

@@ -4,10 +4,8 @@ import { useRouter } from "next/navigation";
 import {
   Box,
   Typography,
-  Button,
   Stack,
 } from "@mui/material";
-import { Add as AddIcon } from "@mui/icons-material";
 import Table from "./components/Table";
 import Filter from "./components/Filter";
 import { Quiz } from "../interfaces/quiz";

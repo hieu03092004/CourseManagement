@@ -7,6 +7,8 @@ import { IMenuAuth } from "../../interfaces/IMenuAuth";
 import { getCookie, deleteCookie } from "../../helpers/cookie";
 import { useSelector, useDispatch } from "react-redux";
 import { checkLogin } from "../../actions";
+import { FaRegUser } from "react-icons/fa6";
+import { FaCartShopping } from "react-icons/fa6";
 
 export default function Header() {
     const router = useRouter();
@@ -80,14 +82,21 @@ export default function Header() {
                     <div className="inner-right">
                         <ul className="flex items-center justify-between text-white font-[600] text-[16px]">
                             {isLogin ? (
-                                <li className="mx-[10px]">
-                                    <button
-                                        onClick={handleLogout}
-                                        className="hover:underline cursor-pointer"
-                                    >
-                                        Đăng xuất
-                                    </button>
-                                </li>
+                                <>
+                                    <li className="mx-[10px] relative">
+                                        <Link href="/member/checkout" className="flex items-center">
+                                            <FaCartShopping className="text-[24px] cursor-pointer hover:opacity-80" />
+                                            <span className="absolute -top-[11px] -right-[11px] bg-secondary text-white text-[10px] font-bold rounded-full w-[18px] h-[18px] flex items-center justify-center">
+                                                0
+                                            </span>
+                                        </Link>
+                                    </li>
+                                    <li className="mx-[10px]">
+                                        <Link href="/member/profile">
+                                            <FaRegUser className="text-[24px] cursor-pointer hover:opacity-80" />
+                                        </Link>
+                                    </li>
+                                </>
                             ) : (
                                 menuAuth.map((item, index) => {
                                     return (
