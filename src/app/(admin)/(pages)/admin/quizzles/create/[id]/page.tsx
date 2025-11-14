@@ -1,7 +1,7 @@
 "use client";
 import { use, useState } from "react";
 import { FaPlus, FaCopy, FaTrash } from "react-icons/fa6";
-import { Add as AddIcon, MoreVert as MoreVertIcon } from "@mui/icons-material";
+import { Add as AddIcon } from "@mui/icons-material";
 import { Button } from "@mui/material";
 import { post } from "../../../../../ultils/request";
 interface PageProps {
@@ -158,7 +158,7 @@ export default function CreateQuizzlePage({ params }: PageProps) {
                         </div>
 
                         <div className="space-y-6">
-                            {quizCards.map((card, index) => (
+                            {quizCards.map((card) => (
                                 <div key={card.id} className="bg-white rounded-lg shadow-sm p-6">
                                     <div className="flex justify-between items-start mb-4">
                                         <input

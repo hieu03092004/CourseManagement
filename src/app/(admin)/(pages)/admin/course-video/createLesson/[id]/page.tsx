@@ -29,7 +29,6 @@ interface LessonCard {
 
 export default function CreateLessonPage({ params }: PageProps) {
   const { id } = use(params);
-  const [lessonName, setLessonName] = useState("");
   const [lessonCards, setLessonCards] = useState<LessonCard[]>([
     {
       id: "1",
@@ -221,16 +220,8 @@ export default function CreateLessonPage({ params }: PageProps) {
       const formData = new FormData();
       formData.append('video', file);
 
-      const response = await fetch('/admin/api/upload-video', {
-        method: 'POST',
-        body: formData,
-      });
-
-      if (!response.ok) {
-        throw new Error('Upload failed');
-      }
-
-      const result = await response.json();
+      // use shared post helper (supports FormData)
+      const result = await post('admin/api/upload-video', formData);
 
       // Cập nhật videoUrl sau khi upload thành công
       setLessonCards((prevCards) =>

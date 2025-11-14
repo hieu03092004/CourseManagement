@@ -4,6 +4,7 @@ import React from 'react';
 import Link from 'next/link';
 import { post } from '../../../../(admin)/ultils/request';
 import { useRouter } from 'next/navigation';
+import BreadCump from '@/app/(client)/components/BreadCump/BreadCump';
 type SvgProps = React.ComponentProps<'svg'>;
 
 const EyeIcon = (props: SvgProps) => (
@@ -90,21 +91,17 @@ export default function RegisterPage() {
     }
   };
 
-  return (
-    <div className="min-h-screen bg-gray-50 flex flex-col items-center pt-4 md:pt-8">
-      <nav className="self-start px-4 md:px-16 text-sm text-gray-700">
-        <ul className="flex space-x-2">
-          <li>
-            <Link href="/" className="hover:underline text-blue-600">Trang chủ</Link>
-          </li>
-          <li>•</li>
-          <li>
-            <Link href="/member" className="hover:underline text-blue-600">Tài khoản thành viên</Link>
-          </li>
-        </ul>
-      </nav>
+  const breadcrumbItems = [
+    { label: "Trang chủ", href: "/" },
+    { label: "Tài khoản thành viên", href: "/member", active: true },
+  ];
 
-      <div className="w-full max-w-xl mt-4 p-5 md:p-8 bg-white shadow-xl rounded-xl border border-gray-100">
+  return (
+    <div className="min-h-screen bg-gray-50 flex flex-col">
+      <BreadCump items={breadcrumbItems} />
+
+      <div className="flex flex-col items-center px-4">
+        <div className="w-full max-w-xl mt-4 p-5 md:p-8 bg-white shadow-xl rounded-xl border border-gray-100">
         <h2 className="text-4xl font-bold text-gray-800 mb-8 text-center">Đăng ký</h2>
 
         <form onSubmit={handleSubmit} className="space-y-6">
@@ -283,6 +280,7 @@ export default function RegisterPage() {
             Đăng nhập
           </Link>
         </p>
+        </div>
       </div>
     </div>
   );

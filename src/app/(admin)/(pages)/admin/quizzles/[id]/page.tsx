@@ -15,7 +15,7 @@ import {
   CircularProgress,
 } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import { Quiz } from "../../interfaces/quiz";
+import { Quiz } from "../../interfaces/IQuiz";
 
 export default function QuizDetailPage() {
   const params = useParams();
@@ -182,7 +182,7 @@ export default function QuizDetailPage() {
           Câu hỏi và đáp án
         </Typography>
 
-        {quiz.questions.map((question, qIndex) => (
+        {quiz.questions?.map((question, qIndex) => (
           <Paper
             key={question.id}
             variant="outlined"

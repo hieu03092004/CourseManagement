@@ -1,12 +1,12 @@
 
 
-const API_DOMAIN=" http://localhost:3002/";
+const API_DOMAIN = "http://localhost:3000/";
 export const get=async(path:string)=>{
     const response=await fetch(API_DOMAIN+path);
     const result=await response.json();
     return result;
 }
-export const post=async(path:string,options:any)=>{
+export const post=async(path:string,options:unknown)=>{
     const response=await fetch(API_DOMAIN+path,{
         method:"POST",
         headers:{
@@ -19,14 +19,14 @@ export const post=async(path:string,options:any)=>{
     const result=await response.json();
     return result;
 }
-export const patch=async(path:string,options:any)=>{
+export const patch=async(path:string,options:unknown)=>{
     const response=await fetch(API_DOMAIN+path,{
         method:"PATCH",
         headers:{
             Accept:"application/json",
             "Content-Type":"application/json",
         },
-        body:JSON.stringify(options),
+        body:JSON.stringify(options as unknown),
     });
     const result=await response.json();
     return result;

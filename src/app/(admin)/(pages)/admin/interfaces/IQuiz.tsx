@@ -16,5 +16,5 @@ export interface Quiz {
   quizName: string;
   courseName: string;
   status: "active" | "inactive";
-  questions: QuizQuestion[];
+  questions?: QuizQuestion[];
 }
