@@ -1,19 +1,24 @@
 "use client";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import Image from "next/image";
 import { useEffect } from "react";
+import { usePathname } from "next/navigation";
 import { IMenuLink } from "../../interfaces/IMenuLink";
 import { IMenuAuth } from "../../interfaces/IMenuAuth";
-import { getCookie, deleteCookie } from "../../helpers/cookie";
+import { getCookie } from "../../helpers/cookie";
 import { useSelector, useDispatch } from "react-redux";
 import { checkLogin } from "../../actions";
 import { FaRegUser } from "react-icons/fa6";
 import { FaCartShopping } from "react-icons/fa6";
 
+interface RootState {
+    loginReducer: boolean;
+}
+
 export default function Header() {
-    const router = useRouter();
+    const pathname = usePathname();
     const dispatch = useDispatch();
-    const isLogin = useSelector((state: any) => state.loginReducer);
+    const isLogin = useSelector((state: RootState) => state.loginReducer);
 
     // Check cookie on mount để set login state
     useEffect(() => {
@@ -24,39 +29,30 @@ export default function Header() {
     }, [dispatch, isLogin]);
     const menu: IMenuLink[] = [
         {
-            title: "Trang chủ",
+            title: "TRANG CHỦ",
             link: "/",
         },
         {
-            title: "Khóa học Zoom",
+            title: "KHOÁ HỌC ZOOM",
             link: "/course",
         },
         {
-            title: "Khóa học Video",
+            title: "KHOÁ HỌC VIDEO",
             link: "/course/course_video",
         },
     ]
     const menuAuth: IMenuAuth[] = [
         {
-            title: "Đăng nhập",
+            title: "ĐĂNG NHẬP",
             link: "/member/login",
             logged: false
         },
         {
-            title: "Đăng ký",
+            title: "ĐĂNG KÝ",
             link: "/member/register",
             logged: false
         },
     ];
-
-    const handleLogout = () => {
-        deleteCookie("id");
-        deleteCookie("fullName");
-        deleteCookie("email");
-        deleteCookie("token");
-        dispatch(checkLogin(false));
-        router.push("/");
-    };
 
     return (
         <header>
@@ -64,14 +60,29 @@ export default function Header() {
                 <div className="container max-w-[1320px] mx-auto flex justify-between items-center">
                     <div className="inner-left ">
                         <Link href="/">
-                            <img src="/demo/Logo.svg" alt="Logo" className="h-[42px] w-auto" />
+                            <Image
+                                src="/demo/Logo.svg"
+                                alt="Logo"
+                                width={160}
+                                height={42}
+                                className="h-[42px] w-auto"
+                            />
                         </Link>
                     </div>
                     <div className="">
-                        <ul className="flex items-center justify-between text-white font-[600] text-[16px]">
+                        <ul className="flex items-center justify-between font-[600] text-[16px]">
                             {menu.map((item, index) => {
+                                const isActive = pathname === item.link;
+
                                 return (
-                                    <li className="mx-[10px]" key={index}>
+                                    <li
+                                        className={`mx-[10px] cursor-pointer transition-colors ${
+                                            isActive
+                                                ? "text-green1"
+                                                : "text-white hover:text-green1"
+                                        }`}
+                                        key={index}
+                                    >
                                         <Link href={item.link}>{item.title}</Link>
                                     </li>
                                 )
@@ -99,8 +110,17 @@ export default function Header() {
                                 </>
                             ) : (
                                 menuAuth.map((item, index) => {
+                                    const isAuthActive = pathname === item.link;
+
                                     return (
-                                        <li className="mx-[10px]" key={index}>
+                                        <li
+                                            className={`mx-[10px] cursor-pointer transition-colors ${
+                                                isAuthActive
+                                                    ? "text-green1"
+                                                    : "text-white hover:text-green1"
+                                            }`}
+                                            key={index}
+                                        >
                                             <Link href={item.link}>{item.title}</Link>
                                         </li>
                                     );

@@ -8,7 +8,7 @@ import {
 } from "@mui/material";
 import Table from "./components/Table";
 import Filter from "./components/Filter";
-import { Quiz } from "../interfaces/quiz";
+import { Quiz } from "../interfaces/IQuiz";
 
 export default function QuizzlesPage() {
   const router = useRouter();
@@ -28,28 +28,6 @@ export default function QuizzlesPage() {
         quizName: "Quiz cơ bản React",
         courseName: "Lập trình React",
         status: "active",
-        questions: [
-          {
-            id: "q1",
-            question: "React là gì?",
-            answers: [
-              { id: "a1", content: "Thư viện JavaScript", isCorrect: true },
-              { id: "a2", content: "Ngôn ngữ lập trình", isCorrect: false },
-              { id: "a3", content: "Framework CSS", isCorrect: false },
-              { id: "a4", content: "Database", isCorrect: false },
-            ],
-          },
-          {
-            id: "q2",
-            question: "JSX là gì?",
-            answers: [
-              { id: "a1", content: "JavaScript XML", isCorrect: true },
-              { id: "a2", content: "Java Syntax", isCorrect: false },
-              { id: "a3", content: "JSON Extended", isCorrect: false },
-              { id: "a4", content: "JavaScript Express", isCorrect: false },
-            ],
-          },
-        ],
       },
       {
         id: "2",
@@ -57,18 +35,6 @@ export default function QuizzlesPage() {
         quizName: "Quiz về React Hooks",
         courseName: "Lập trình React",
         status: "active",
-        questions: [
-          {
-            id: "q1",
-            question: "useState dùng để làm gì?",
-            answers: [
-              { id: "a1", content: "Quản lý state", isCorrect: true },
-              { id: "a2", content: "Xử lý side effect", isCorrect: false },
-              { id: "a3", content: "Tạo context", isCorrect: false },
-              { id: "a4", content: "Gọi API", isCorrect: false },
-            ],
-          },
-        ],
       },
       {
         id: "3",
@@ -76,18 +42,13 @@ export default function QuizzlesPage() {
         quizName: "Quiz Node.js",
         courseName: "Lập trình Node.js",
         status: "inactive",
-        questions: [
-          {
-            id: "q1",
-            question: "Node.js chạy trên môi trường nào?",
-            answers: [
-              { id: "a1", content: "Server", isCorrect: true },
-              { id: "a2", content: "Browser", isCorrect: false },
-              { id: "a3", content: "Mobile", isCorrect: false },
-              { id: "a4", content: "Desktop", isCorrect: false },
-            ],
-          },
-        ],
+      },
+      {
+        id: "4",
+        lessonName: "Node.js cơ bản",
+        quizName: "Quiz Node.js",
+        courseName: "Lập trình Node.js",
+        status: "inactive",
       },
     ];
     setQuizzes(mockQuizzes);
@@ -128,10 +89,6 @@ export default function QuizzlesPage() {
     if (confirm(`Bạn có chắc chắn muốn xóa bài quiz "${quiz.quizName}"?`)) {
       setQuizzes(quizzes.filter((q) => q.id !== quiz.id));
     }
-  };
-
-  const handleAddQuiz = () => {
-    alert("Chức năng thêm bài quiz đang được phát triển");
   };
 
   return (

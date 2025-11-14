@@ -9,7 +9,7 @@ import {
   Typography,
 } from "@mui/material";
 import { FaStar, FaBook, FaUser } from "react-icons/fa6";
-import { Course } from "../../interfaces/course";
+import { Course } from "../../../interfaces/course";
 import Link from "next/link";
 
 interface CardItemProps {

@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
 import { IoMdArrowDropdownCircle } from "react-icons/io";
-import LessonList from "./LessonList";
+import LessonList from "../Lesson/LessonList";
 
 interface Lesson {
   id: number;

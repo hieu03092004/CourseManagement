@@ -12,12 +12,9 @@ import {
   MenuItem,
   Chip,
   TablePagination,
-  TableSortLabel,
 } from "@mui/material";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
-import { Quiz } from "../../interfaces/quiz";
-
-type SortOrder = "asc" | "desc";
+import { Quiz } from "../../interfaces/IQuiz";
 
 interface TableProps {
   quizzes: Quiz[];
@@ -28,16 +25,15 @@ interface TableProps {
 }
 
 interface HeadCell {
-  id: keyof Quiz | "stt";
+  id: string;
   label: string;
-  sortable: boolean;
 }
 
 const headCells: HeadCell[] = [
-  { id: "stt", label: "STT", sortable: false },
-  { id: "lessonName", label: "Tên bài học", sortable: true },
-  { id: "quizName", label: "Tên bài quiz", sortable: true },
-  { id: "status", label: "Trạng thái", sortable: true },
+  { id: "stt", label: "STT" },
+  { id: "lessonName", label: "Tên bài học" },
+  { id: "quizName", label: "Tên bài quiz" },
+  { id: "status", label: "Trạng thái" },
 ];
 
 const getStatusDisplay = (status: Quiz["status"]) => {
@@ -58,8 +54,6 @@ const Table: React.FC<TableProps> = ({
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const [menuId, setMenuId] = React.useState<string | null>(null);
   const [rowsPerPage] = React.useState(10);
-  const [orderBy, setOrderBy] = React.useState<keyof Quiz>("quizName");
-  const [order, setOrder] = React.useState<SortOrder>("asc");
 
   const handleMenuOpen = (event: React.MouseEvent<HTMLElement>, id: string) => {
     setAnchorEl(event.currentTarget);
@@ -81,30 +75,8 @@ const Table: React.FC<TableProps> = ({
     onDelete(quiz);
   };
 
-  const handleRequestSort = (property: keyof Quiz) => {
-    const isAsc = orderBy === property && order === "asc";
-    setOrder(isAsc ? "desc" : "asc");
-    setOrderBy(property);
-  };
-
-  // Sort function
-  const sortedQuizzes = React.useMemo(() => {
-    return [...quizzes].sort((a, b) => {
-      const aValue = a[orderBy];
-      const bValue = b[orderBy];
-
-      if (aValue < bValue) {
-        return order === "asc" ? -1 : 1;
-      }
-      if (aValue > bValue) {
-        return order === "asc" ? 1 : -1;
-      }
-      return 0;
-    });
-  }, [quizzes, order, orderBy]);
-
   // Calculate the current page's data
-  const paginatedQuizzes = sortedQuizzes.slice(
+  const paginatedQuizzes = quizzes.slice(
     page * rowsPerPage,
     page * rowsPerPage + rowsPerPage
   );
@@ -116,17 +88,7 @@ const Table: React.FC<TableProps> = ({
           <TableRow>
             {headCells.map((headCell) => (
               <TableCell key={headCell.id}>
-                {headCell.sortable && headCell.id !== "stt" ? (
-                  <TableSortLabel
-                    active={orderBy === headCell.id}
-                    direction={orderBy === headCell.id ? order : "asc"}
-                    onClick={() => handleRequestSort(headCell.id as keyof Quiz)}
-                  >
-                    {headCell.label}
-                  </TableSortLabel>
-                ) : (
-                  headCell.label
-                )}
+                {headCell.label}
               </TableCell>
             ))}
             <TableCell>Hành động</TableCell>

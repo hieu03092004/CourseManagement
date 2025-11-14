@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { setCookie } from '@/app/(client)/helpers/cookie';
 import { checkLogin } from '@/app/(client)/actions';
 import { useDispatch } from 'react-redux';
+import BreadCump from '@/app/(client)/components/BreadCump/BreadCump';
 
 type SvgProps = React.ComponentProps<'svg'>;
 
@@ -77,21 +78,17 @@ export default function LoginPage() {
 
   const labelClass = "block text-base font-medium text-gray-700 after:content-['*'] after:ml-0.5 after:text-red-500";
 
-  return (
-    <div className="min-h-screen bg-gray-50 flex flex-col items-center pt-4 md:pt-8">
-      <nav className="self-start px-4 md:px-16 text-sm text-gray-700">
-        <ul className="flex space-x-2">
-          <li>
-            <Link href="/" className="hover:underline text-blue-600">Trang chủ</Link>
-          </li>
-          <li>•</li>
-          <li>
-            <Link href="/member" className="hover:underline text-blue-600">Tài khoản thành viên</Link>
-          </li>
-        </ul>
-      </nav>
+  const breadcrumbItems = [
+    { label: "Trang chủ", href: "/" },
+    { label: "Tài khoản thành viên", href: "/member", active: true },
+  ];
 
-      <div className="w-full max-w-lg mt-4 p-5 md:p-8 bg-white shadow-xl rounded-xl border border-gray-100">
+  return (
+    <div className="min-h-screen bg-gray-50 flex flex-col">
+      <BreadCump items={breadcrumbItems} />
+
+      <div className="flex flex-col items-center px-4">
+        <div className="w-full max-w-lg mt-4 p-5 md:p-8 bg-white shadow-xl rounded-xl border border-gray-100">
         <h2 className="text-4xl font-bold text-gray-800 mb-8 text-center">Đăng nhập</h2>
 
         <form className="space-y-6" onSubmit={handleSubmit} method="post" action="/member/login">
@@ -170,6 +167,7 @@ export default function LoginPage() {
             Đăng ký ngay
           </Link>
         </p>
+        </div>
       </div>
     </div>
   );

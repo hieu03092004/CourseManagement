@@ -1,7 +1,7 @@
 import React from "react";
 import { Box } from "@mui/material";
-import CardItem from "./Card/CardItem";
-import { Course } from "../../interfaces/course";
+import CardItem from "./CardItem";
+import { Course } from "../../../interfaces/course";
 
 interface CardListProps {
   courses: Course[];

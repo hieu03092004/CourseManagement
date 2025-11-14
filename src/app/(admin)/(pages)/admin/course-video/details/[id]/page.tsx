@@ -1,9 +1,7 @@
 "use client";
 import { use } from "react";
-import Link from "next/link";
 import Section1 from "./Section1";
-import Section2 from "../../../../../../(client)/(pages)/course/[id]/Section2";
-import TopicList from "../../components/TopicList";
+import TopicList from "../../components/Topic/TopicList";
 
 interface PageProps {
   params: Promise<{
@@ -39,7 +37,8 @@ interface CourseData {
   topics: Topic[];
 }
 const fetchCourseData = (id: string) => {
-  let data: CourseData = {
+  console.log(id);
+  const data: CourseData = {
     title: "Học Lập Trình C qua 170 bài giảng, 350 bài tập thực hành và 200 câu trắc nghiệm (Update 2025)",
     description: "Khóa học lập trình C của 28Tech cung cấp trọng vẹn kiến thức lý thuyết và bài tập về ngôn ngữ lập trình C. Học viên được thực hành với 320 bài tập lập trình từ cơ bản tới nâng cao và 200 bài tập trắc nghiệm củng cố lý thuyết. Học viên sẽ làm bài và chấm bài tự động với website Hackerrank, các bài tập đều có lời giải chi tiết và học viên sẽ được hỗ trợ giải đáp khi gặp khó khăn.",
     rating: 4,
@@ -117,10 +116,6 @@ export default function CourseDetailsPage({ params }: PageProps) {
           status="active"
         />
         <TopicList topics={courseData.topics} />
-        {/* <Section3
-          rating={courseData.rating}
-          reviews={courseData.reviews}
-        /> */}
       </div>
     </div>
   );
