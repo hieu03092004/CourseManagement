@@ -3,8 +3,8 @@ import type { Metadata } from "next";
 import { Be_Vietnam_Pro } from "next/font/google";
 
 // CSS/global styles dùng cho toàn app
-import "./globals.css";
 import "../styles/app.scss";
+import "./globals.css";
 
 const beVietnamPro = Be_Vietnam_Pro({
   variable: "--font-be-vietnam-pro",
@@ -21,11 +21,9 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       {/* Root layout chỉ bọc font + providers chung. Không render Header/Footer ở đây */}
-      <body className={`${beVietnamPro.variable} antialiased`}>
-        {children}
-      </body>
+      <body className={`${beVietnamPro.variable} antialiased`}>{children}</body>
     </html>
   );
 }
