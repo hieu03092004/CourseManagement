@@ -10,17 +10,19 @@ type props = {
   studentCount: number;
 };
 
-export default function ({ rating, title, description, reviewsCount, studentCount }: props) {
+export default function ({
+  rating,
+  title,
+  description,
+  reviewsCount,
+  studentCount,
+}: props) {
   return (
     <>
       <div className="herro-banner bg-primary h-auto text-white flex items-center justify-start pb-8">
         <div className=" pt-4 herro-content mx-[135px] px-[8] w-1/2">
-          <div className=" font-bold herro-title text-[30px]">
-            {title}
-          </div>
-          <div className="herro-desc text-[13px] pt-4">
-            {description}
-          </div>
+          <div className=" font-bold herro-title text-[30px]">{title}</div>
+          <div className="herro-desc text-[13px] pt-4">{description}</div>
           <ul className="stats list-none flex gap-4 mt-8 text-[13px] ">
             <li className="overall-rating flex gap-2 items-center justify-center ">
               <span className="">{rating}</span>

@@ -2,23 +2,35 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useEffect } from "react";
+import { FaCartShopping, FaRegUser } from "react-icons/fa6";
+import { useDispatch, useSelector } from "react-redux";
+import { checkLogin } from "../../actions";
+import { deleteCookie, getCookie } from "../../helpers/cookie";
+import { IMenuAuth } from "../../interfaces/IMenuAuth";
 import { usePathname } from "next/navigation";
 import { IMenuLink } from "../../interfaces/IMenuLink";
-import { IMenuAuth } from "../../interfaces/IMenuAuth";
-import { getCookie } from "../../helpers/cookie";
-import { useSelector, useDispatch } from "react-redux";
-import { checkLogin } from "../../actions";
-import { FaRegUser } from "react-icons/fa6";
-import { FaCartShopping } from "react-icons/fa6";
-
 interface RootState {
-    loginReducer: boolean;
+  loginReducer: boolean;
 }
+interface Course {
+  id: string;
+}
+interface Cart {
+  listCourse: Course[];
+}
+
+const countCarts = () => {
+  const data: Cart = {
+    listCourse: [{ id: "1" }, { id: "1" }, { id: "1" }],
+  };
+  return data;
+};
 
 export default function Header() {
     const pathname = usePathname();
     const dispatch = useDispatch();
     const isLogin = useSelector((state: RootState) => state.loginReducer);
+    const totalCart = countCarts();
 
     // Check cookie on mount để set login state
     useEffect(() => {
@@ -56,7 +68,7 @@ export default function Header() {
 
     return (
         <header>
-            <div className="header-main py-[20px] bg-primary fixed top-0 left-0 right-0 z-999">
+            <div className="header-main py-[20px] bg-primary fixed top-0 left-0 right-0 z-990">
                 <div className="container max-w-[1320px] mx-auto flex justify-between items-center">
                     <div className="inner-left ">
                         <Link href="/">
@@ -95,10 +107,10 @@ export default function Header() {
                             {isLogin ? (
                                 <>
                                     <li className="mx-[10px] relative">
-                                        <Link href="/member/checkout" className="flex items-center">
+                                        <Link href="/cart" className="flex items-center">
                                             <FaCartShopping className="text-[24px] cursor-pointer hover:opacity-80" />
                                             <span className="absolute -top-[11px] -right-[11px] bg-secondary text-white text-[10px] font-bold rounded-full w-[18px] h-[18px] flex items-center justify-center">
-                                                0
+                                                {totalCart.listCourse.length}
                                             </span>
                                         </Link>
                                     </li>

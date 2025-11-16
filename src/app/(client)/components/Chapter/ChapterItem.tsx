@@ -34,7 +34,11 @@ function ChapterItem({ topic }: Props) {
           <span>{topic.title.toUpperCase()}</span>
           <div className="flex items-center gap-4">
             <span className="me-[10px]">Timeline</span>
-            <button type="button" onClick={toggleCollapse} className="cursor-pointer min-w-[21px]">
+            <button
+              type="button"
+              onClick={toggleCollapse}
+              className="cursor-pointer min-w-[21px]"
+            >
               <IoMdArrowDropdownCircle
                 className={` cursor-pointer ${
                   collapsed ? "transform rotate-90" : ""
@@ -42,7 +46,6 @@ function ChapterItem({ topic }: Props) {
               />
             </button>
           </div>
-          
         </div>
 
         <LessonList isCollapsed={collapsed} lessons={topic.lessons} />

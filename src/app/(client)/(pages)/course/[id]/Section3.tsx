@@ -1,5 +1,5 @@
 "use client";
-import { useState, useMemo } from "react";
+import { useMemo, useState } from "react";
 import { FaStarHalfAlt } from "react-icons/fa";
 import { FaRegStar, FaStar } from "react-icons/fa6";
 import { LiaComment } from "react-icons/lia";
@@ -17,9 +17,9 @@ type props = {
 
 function getInitials(name: string) {
   return name
-    .split(' ')
-    .map(word => word[0])
-    .join('')
+    .split(" ")
+    .map((word) => word[0])
+    .join("")
     .toUpperCase()
     .slice(0, 3);
 }
@@ -161,16 +161,17 @@ export default function ({ rating, reviews }: props) {
 
   const ratingBreakdown = useMemo(() => {
     const total = reviews.length;
-    if (total === 0) return [
-      { stars: 5, percent: 0 },
-      { stars: 4, percent: 0 },
-      { stars: 3, percent: 0 },
-      { stars: 2, percent: 0 },
-      { stars: 1, percent: 0 },
-    ];
+    if (total === 0)
+      return [
+        { stars: 5, percent: 0 },
+        { stars: 4, percent: 0 },
+        { stars: 3, percent: 0 },
+        { stars: 2, percent: 0 },
+        { stars: 1, percent: 0 },
+      ];
 
     const counts = { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 };
-    reviews.forEach(review => {
+    reviews.forEach((review) => {
       const roundedRating = Math.round(review.rating) as 1 | 2 | 3 | 4 | 5;
       if (roundedRating >= 1 && roundedRating <= 5) {
         counts[roundedRating]++;
@@ -250,7 +251,10 @@ export default function ({ rating, reviews }: props) {
         </div>
         <div className="comment-section mt-1">
           {reviews.map((review, index) => (
-            <div key={index} className="comment-item flex py-8 border-b border-gray-300 last:border-b-0">
+            <div
+              key={index}
+              className="comment-item flex py-8 border-b border-gray-300 last:border-b-0"
+            >
               <div className="w-1/5 in4-comment flex flex-col text-[13px] justify-between items-center">
                 <span className="w-[50px] rounded-[50%] bg-sky-500 h-[50px] text-center leading-[53px] text-white ">
                   {getInitials(review.userName)}
