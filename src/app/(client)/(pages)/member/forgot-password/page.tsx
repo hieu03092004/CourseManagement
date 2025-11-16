@@ -1,6 +1,7 @@
 "use client"
 import React from 'react';
-import Link from 'next/link'; 
+import Link from 'next/link';
+import ButtonInput from '@/app/(client)/components/Button/btn_input'; 
 
 type SvgProps = React.ComponentProps<'svg'>;
 
@@ -79,13 +80,7 @@ export default function ForgotPasswordPage() {
           </div>
 
           <div className="pt-2">
-            <button
-              type="submit"
-              className="w-full flex justify-center py-3.5 px-4 border border-transparent rounded-lg shadow-md text-xl font-semibold text-white bg-green-400 hover:bg-green-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition duration-150 ease-in-out"
-              style={{ backgroundColor: '#00ff99', color: 'white' }}
-            >
-              Xác nhận
-            </button>
+            <ButtonInput text="Xác nhận" type="submit" />
           </div>
         </form>
 

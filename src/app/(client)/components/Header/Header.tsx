@@ -29,26 +29,26 @@ export default function Header() {
     }, [dispatch, isLogin]);
     const menu: IMenuLink[] = [
         {
-            title: "TRANG CHỦ",
+            title: "Trang chủ",
             link: "/",
         },
         {
-            title: "KHOÁ HỌC ZOOM",
+            title: "Khóa học zoom",
             link: "/course",
         },
         {
-            title: "KHOÁ HỌC VIDEO",
+            title: "Khóa học video",
             link: "/course/course_video",
         },
     ]
     const menuAuth: IMenuAuth[] = [
         {
-            title: "ĐĂNG NHẬP",
+            title: "Đăng nhập",
             link: "/member/login",
             logged: false
         },
         {
-            title: "ĐĂNG KÝ",
+            title: "Đăng ký",
             link: "/member/register",
             logged: false
         },
@@ -78,8 +78,8 @@ export default function Header() {
                                     <li
                                         className={`mx-[10px] cursor-pointer transition-colors ${
                                             isActive
-                                                ? "text-green1"
-                                                : "text-white hover:text-green1"
+                                                ? "text-hightlight"
+                                                : "text-white hover:text-hightlight"
                                         }`}
                                         key={index}
                                     >
@@ -116,8 +116,8 @@ export default function Header() {
                                         <li
                                             className={`mx-[10px] cursor-pointer transition-colors ${
                                                 isAuthActive
-                                                    ? "text-green1"
-                                                    : "text-white hover:text-green1"
+                                                    ? "text-hightlight"
+                                                    : "text-white hover:text-hightlight"
                                             }`}
                                             key={index}
                                         >
