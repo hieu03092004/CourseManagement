@@ -5,7 +5,8 @@ import { FaRegClipboard, FaRegUser, FaVideo } from "react-icons/fa6";
 import { FaTicketAlt } from "react-icons/fa";
 import { IconType } from "react-icons";
 import LeftProfile from "../dashboard/SectionLeftProfile";
-import SectionRightProfile from "./sectionRightProfile";
+import Input from "../../../components/Form/Input";
+import ButtonInput from "../../../components/Button/btn_input";
 import { IProfile } from "../../../interfaces/IProfile";
 
 interface MenuItem {
@@ -31,7 +32,7 @@ const fetchProfileData = async (): Promise<IProfile> => {
   } as IProfile;
 };
 
-export default function ProfilePage() {
+export default function ChangePasswordPage() {
   const pathname = usePathname();
   const [profile, setProfile] = useState<IProfile | null>(null);
 
@@ -80,9 +81,9 @@ export default function ProfilePage() {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
     const data = {
-      fullName: formData.get("full_name"),
-      birthday: formData.get("birthday"),
-      sex: formData.get("sex")
+      oldPassword: formData.get("old_password"),
+      newPassword: formData.get("new_password"),
+      rePassword: formData.get("re_password")
     };
     console.log("Form submitted:", data);
   };
@@ -102,7 +103,40 @@ export default function ProfilePage() {
         </div>
 
         <div className="md:col-span-9">
-          <SectionRightProfile profile={profile} onSubmit={handleSubmit} />
+          <div className="rounded-[8px] bg-gray-50 mb-[10px] p-[15px] h-full">
+            <form onSubmit={handleSubmit} className="contact-form" autoComplete="off">
+              <h2 className="text-[20px] font-[700] mb-[20px] text-dark1">Đổi mật khẩu</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="col-span-1">
+                  <Input
+                    htmlFor="old_password"
+                    label="Mật khẩu"
+                    name="old_password"
+                    type="password"
+                    required
+                  />
+
+                  <Input
+                    htmlFor="new_password"
+                    label="Mật khẩu mới"
+                    name="new_password"
+                    type="password"
+                    required
+                  />
+
+                  <Input
+                    htmlFor="re_password"
+                    label="Nhập lại mật khẩu mới"
+                    name="re_password"
+                    type="password"
+                    required
+                  />
+
+                  <ButtonInput text="Cập nhật" />
+                </div>
+              </div>
+            </form>
+          </div>
         </div>
       </div>
     </div>

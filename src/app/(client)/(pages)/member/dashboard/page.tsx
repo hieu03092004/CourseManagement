@@ -66,7 +66,7 @@ export default function MemberDashboardPage() {
         },
         {
           title: "Đơn hàng",
-          link: "/member/orders",
+          link: "/member/order",
           icon: FaRegClipboard
         }
       ]
@@ -99,7 +99,7 @@ export default function MemberDashboardPage() {
 
         <div className="md:col-span-9">
           <div className="rounded-lg bg-gray-50 p-6 h-full">
-            <h2 className="text-xl font-bold mb-6">Thông tin cá nhân</h2>
+            <h2 className="text-[20px] font-[700] mb-[20px] text-dark1">Thông tin cá nhân</h2>
             {profile ? (
               <>
                 <ul className="space-y-4 mb-8">

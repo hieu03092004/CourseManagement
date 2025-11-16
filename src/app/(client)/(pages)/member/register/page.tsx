@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { post } from '../../../../(admin)/ultils/request';
 import { useRouter } from 'next/navigation';
 import BreadCump from '@/app/(client)/components/BreadCump/BreadCump';
+import ButtonInput from '@/app/(client)/components/Button/btn_input';
 type SvgProps = React.ComponentProps<'svg'>;
 
 const EyeIcon = (props: SvgProps) => (
@@ -264,13 +265,7 @@ export default function RegisterPage() {
           </div>
 
           <div className="pt-4">
-            <button
-              type="submit"
-              className="w-full flex justify-center py-3.5 px-4 border border-transparent rounded-lg shadow-md text-xl font-semibold text-white bg-green-400 hover:bg-green-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition duration-150 ease-in-out"
-              style={{ backgroundColor: '#00ff99', color: 'white' }}
-            >
-              Đăng ký
-            </button>
+            <ButtonInput text="Đăng ký" type="submit" />
           </div>
         </form>
 

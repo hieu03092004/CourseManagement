@@ -77,7 +77,7 @@ export default function QuizPage({ params }: PageProps) {
         </div>
 
         {/* Tab Content */}
-        <div className="bg-white rounded-b-lg shadow overflow-hidden">
+        <div className="bg-white rounded-b-lg shadow overflow-hidden animate-tab-fade-in" key={activeTab}>
           {activeTab === "quizzes" ? (
             // Tab 1: Danh sách các bài kiểm tra
             <table className="min-w-full divide-y divide-gray-200">

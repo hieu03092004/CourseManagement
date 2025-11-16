@@ -18,7 +18,7 @@ export default function CardItem({ course }: CardItemProps) {
 
   return (
     <>
-      <Link href={`/course/${course.id}`}>
+      <Link href={`/course/${course.id}`} className="block transition-transform duration-300 hover:scale-105">
         <div className="bg-white rounded-[10px]">
           <div className="">
             <img
