@@ -166,15 +166,16 @@ export default function EditQuizzlePage({ params }: PageProps) {
                 orderIndex: index + 1,
             };
         });
+        console.log("Payload:", JSON.stringify(payload, null, 2));
 
-        try {
-            const response = await patch(`quizzes/${id}`, payload);
-            console.log("Response:", response);
-            alert("Cập nhật bài quiz thành công!");
-        } catch (error) {
-            console.error("Error:", error);
-            alert("Có lỗi xảy ra khi cập nhật bài quiz!");
-        }
+        // try {
+        //     const response = await patch(`quizzes/${id}`, payload);
+        //     console.log("Response:", response);
+        //     alert("Cập nhật bài quiz thành công!");
+        // } catch (error) {
+        //     console.error("Error:", error);
+        //     alert("Có lỗi xảy ra khi cập nhật bài quiz!");
+        // }
     };
 
     if (loading) {

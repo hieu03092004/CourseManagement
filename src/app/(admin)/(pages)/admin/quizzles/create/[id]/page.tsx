@@ -1,25 +1,14 @@
 "use client";
-import { use, useState } from "react";
+import { use, useState, useRef } from "react";
 import { FaPlus, FaCopy, FaTrash } from "react-icons/fa6";
 import { Add as AddIcon } from "@mui/icons-material";
 import { Button } from "@mui/material";
 import { post } from "../../../../../ultils/request";
+import QuizManager, { QuizCard } from "./helpers/createQuizz";
 interface PageProps {
     params: Promise<{
         id: string;
     }>;
-}
-
-interface QuizOption {
-    id: string;
-    text: string;
-}
-
-interface QuizCard {
-    id: string;
-    question: string;
-    options: QuizOption[];
-    correctOption: string;
 }
 
 export default function CreateQuizzlePage({ params }: PageProps) {
@@ -38,78 +27,40 @@ export default function CreateQuizzlePage({ params }: PageProps) {
             correctOption: "1",
         },
     ]);
+    
+    const quizManagerRef = useRef(new QuizManager(quizCards));
 
     const addNewCard = (afterId: string) => {
-        const newCard: QuizCard = {
-            id: Date.now().toString(),
-            question: "",
-            options: [
-                { id: "1", text: "" },
-                { id: "2", text: "" },
-                { id: "3", text: "" },
-                { id: "4", text: "" },
-            ],
-            correctOption: "1",
-        };
-
-        const index = quizCards.findIndex((card) => card.id === afterId);
-        const newCards = [...quizCards];
-        newCards.splice(index + 1, 0, newCard);
-        setQuizCards(newCards);
+        const updatedCards = quizManagerRef.current.addNewCard(afterId);
+        setQuizCards([...updatedCards]);
     };
 
     const duplicateCard = (cardId: string) => {
-        const cardToDuplicate = quizCards.find((card) => card.id === cardId);
-        if (!cardToDuplicate) return;
-
-        const duplicatedCard: QuizCard = {
-            ...cardToDuplicate,
-            id: Date.now().toString(),
-        };
-
-        const index = quizCards.findIndex((card) => card.id === cardId);
-        const newCards = [...quizCards];
-        newCards.splice(index + 1, 0, duplicatedCard);
-        setQuizCards(newCards);
+        const updatedCards = quizManagerRef.current.duplicateCard(cardId);
+        setQuizCards([...updatedCards]);
     };
 
     const deleteCard = (cardId: string) => {
-        if (quizCards.length === 1) return;
-        setQuizCards(quizCards.filter((card) => card.id !== cardId));
+        const updatedCards = quizManagerRef.current.deleteCard(cardId);
+        setQuizCards([...updatedCards]);
     };
 
     const updateQuestion = (cardId: string, question: string) => {
-        setQuizCards(
-            quizCards.map((card) =>
-                card.id === cardId ? { ...card, question } : card
-            )
-        );
+        const updatedCards = quizManagerRef.current.updateQuestion(cardId, question);
+        setQuizCards([...updatedCards]);
     };
 
     const updateOption = (cardId: string, optionId: string, text: string) => {
-        setQuizCards(
-            quizCards.map((card) =>
-                card.id === cardId
-                    ? {
-                        ...card,
-                        options: card.options.map((opt) =>
-                            opt.id === optionId ? { ...opt, text } : opt
-                        ),
-                    }
-                    : card
-            )
-        );
+        const updatedCards = quizManagerRef.current.updateOption(cardId, optionId, text);
+        setQuizCards([...updatedCards]);
     };
 
     const updateCorrectOption = (cardId: string, optionId: string) => {
-        setQuizCards(
-            quizCards.map((card) =>
-                card.id === cardId ? { ...card, correctOption: optionId } : card
-            )
-        );
+        const updatedCards = quizManagerRef.current.updateCorrectOption(cardId, optionId);
+        setQuizCards([...updatedCards]);
     };
 
-    const handleSubmit = async (e: React.FormEvent) => {
+    const handleSubmit =  (e: React.FormEvent) => {
         e.preventDefault();
 
         const payload = quizCards.map((card, index) => {
@@ -131,8 +82,9 @@ export default function CreateQuizzlePage({ params }: PageProps) {
         //console.log("Payload JSON:", JSON.stringify(payload, null, 2));
 
         try {
-            const response = await post("quizzes", payload);
-            console.log("Response:", response);
+            // const response = await post("quizzes", payload);
+            // console.log("Response:", response);
+            console.log("Payload:", JSON.stringify(payload, null, 2));
             alert("Tạo bài quiz thành công!");
         } catch (error) {
             console.error("Error:", error);
