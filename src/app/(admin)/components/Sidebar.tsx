@@ -14,10 +14,8 @@ import {
 } from '@mui/material';
 import {
     AppRegistration,
-    Apps, CalendarMonth,
+    Apps,
     Construction,
-    EventAvailable,
-    FreeCancellation,
     Home,
     MeetingRoom,
     Person
@@ -51,7 +49,7 @@ const Sidebar: React.FC<SidebarProps> = ({ open, handleDrawerToggle, isMobile: p
         { path: '/', label: 'Trang chủ', icon: <Home /> },
         { path: '/admin/orders', label: 'Đơn hàng', icon: <MeetingRoom /> },
         { path: '/admin/quizzles', label: 'Quizzles', icon: <Construction /> },
-        { path: '/account', label: 'Tài khoản', icon: <Person /> },
+        { path: '/admin/accounts', label: 'Tài khoản', icon: <Person /> },
         { path: '/admin/course-video', label: 'Khoá học online', icon: <AppRegistration /> },
         { path: '/course-zoom', label: 'Khoá học zoom', icon: <Apps /> },
     ];
