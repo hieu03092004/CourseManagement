@@ -156,7 +156,7 @@ function FormInner() {
   );
 }
 
-export default function ({ rating, reviews }: props) {
+export default function Section3({ rating, reviews }: props) {
   const [formOpen, setFormOpen] = useState(false);
 
   const ratingBreakdown = useMemo(() => {

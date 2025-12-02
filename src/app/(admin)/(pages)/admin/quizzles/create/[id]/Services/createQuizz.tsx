@@ -94,6 +94,30 @@ class QuizManager {
     );
     return this.quizCards;
   }
+
+  /**
+   * Transform quiz cards to backend format
+   * Structure: { lessonId, question, answers, trueAnswer }
+   */
+  prepareDataForBackend(lessonId: string): Array<{
+    lessonId: number;
+    question: string;
+    answers: string[];
+    trueAnswer: number;
+  }> {
+    return this.quizCards.map((card) => {
+      const correctAnswerIndex = card.options.findIndex(
+        (opt) => opt.id === card.correctOption
+      );
+
+      return {
+        lessonId: parseInt(lessonId),
+        question: card.question,
+        answers: card.options.map((opt) => opt.text),
+        trueAnswer: correctAnswerIndex >= 0 ? correctAnswerIndex : 0,
+      };
+    });
+  }
 }
 
 export default QuizManager;

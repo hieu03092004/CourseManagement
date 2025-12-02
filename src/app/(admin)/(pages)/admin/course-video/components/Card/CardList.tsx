@@ -1,13 +1,14 @@
 import React from "react";
 import { Box } from "@mui/material";
 import CardItem from "./CardItem";
-import { Course } from "../../../interfaces/course";
+import { Course } from "../../../interfaces/CourseVideo/ICourseVideo";
 
-interface CardListProps {
+export interface CardListProps {
   courses: Course[];
+  onCourseDeleted?: () => void;
 }
 
-const CardList: React.FC<CardListProps> = ({ courses }) => {
+const CardList: React.FC<CardListProps> = ({ courses, onCourseDeleted }) => {
   return (
     <Box
       sx={{
@@ -22,7 +23,7 @@ const CardList: React.FC<CardListProps> = ({ courses }) => {
       }}
     >
       {courses.map((course) => (
-        <CardItem key={course.id} course={course} />
+        <CardItem key={course.id} course={course} onCourseDeleted={onCourseDeleted} />
       ))}
     </Box>
   );

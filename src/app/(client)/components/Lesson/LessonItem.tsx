@@ -1,12 +1,7 @@
 "use client";
-import {
-  Dialog,
-  DialogBackdrop,
-  DialogPanel,
-  DialogTitle,
-} from "@headlessui/react";
 import { useState } from "react";
 import { FaCirclePlay } from "react-icons/fa6";
+import DiagLogVideo from "@/app/(client)/components/Modal/DiagLogVideo";
 
 interface Lesson {
   title: string;
@@ -48,36 +43,12 @@ function LessonItem({ lesson }: Props) {
         </div>
       </li>
 
-      <Dialog
-        open={modalOpen}
+      <DiagLogVideo
+        isOpen={modalOpen}
         onClose={() => setModalOpen(false)}
-        className="relative z-1000 w-full"
-      >
-        <DialogBackdrop className="fixed inset-0 bg-black/50 data-[closed]:opacity-0 transition" />
-
-        <div className="fixed inset-0 flex w-screen items-center  p-4">
-          <DialogPanel className="w-full  bg-white rounded-md shadow-lg overflow-hidden">
-            <div className="flex items-center justify-between p-4 border-b">
-              <DialogTitle className="text-lg font-semibold">
-                {lesson.title}
-              </DialogTitle>
-              <button
-                onClick={() => setModalOpen(false)}
-                className="px-3 py-1 rounded text-sm bg-red-500 text-white"
-              >
-                ĐÓNG
-              </button>
-            </div>
-
-            <div className="bg-black">
-              <video controls className="w-full h-[600px] bg-black">
-                <source src={lesson.videoUrl} type="video/mp4" />
-                Trình duyệt của bạn không hỗ trợ thẻ video.
-              </video>
-            </div>
-          </DialogPanel>
-        </div>
-      </Dialog>
+        videoUrl={lesson.videoUrl}
+        title={lesson.title}
+      />
     </>
   );
 }

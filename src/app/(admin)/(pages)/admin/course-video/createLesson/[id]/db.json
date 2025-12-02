@@ -1,0 +1,65 @@
+
+  {
+    "course_id":1,
+    "data": [
+        {
+        "courseId":12,
+        "topic":"Day la chu de 1",
+        "orderIndex":1,
+        "lessons":[
+            {
+                "title":"Test12345678",
+                "duration":120,
+                "orderIndex":1,
+                "video_file":{
+                    "type": "File",
+                    "name": "day1_lesson1.mp4",
+                    "size": 12345678,
+                    "mime": "video/mp4"
+                }
+            },
+             {
+                "title":"Lesson 2",
+                "duration":180,
+                "orderIndex":2,
+                "video_file":{
+                    "type": "File",
+                    "name": "day1_lesson2.mp4",
+                    "size": 23456789,
+                    "mime": "video/mp4"
+                }
+            }
+        ]
+        },
+        {
+            "courseId":12,
+            "topic":"Day la chu de 2",
+            "orderIndex":2,
+        "lessons":[
+            {
+                "title":"Test1234567891011",
+                "duration":120,
+                "orderIndex":1,
+                "video_file":{
+                    "type": "File",
+                    "name": "day1_lesson1.mp4",
+                    "size": 12345678,
+                    "mime": "video/mp4"
+                }
+            },
+             {
+                "title":"Test123456789101112",
+                "duration":180,
+                "orderIndex":2,
+                "video_file":{
+                    "type": "File",
+                    "name": "day1_lesson2.mp4",
+                    "size": 23456789,
+                    "mime": "video/mp4"
+                }
+            }
+        ]
+        }
+    ]
+        
+}

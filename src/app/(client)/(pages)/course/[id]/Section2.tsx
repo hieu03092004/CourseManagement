@@ -10,7 +10,7 @@ type props = {
   studentCount: number;
 };
 
-export default function ({
+export default function Section2({
   rating,
   title,
   description,

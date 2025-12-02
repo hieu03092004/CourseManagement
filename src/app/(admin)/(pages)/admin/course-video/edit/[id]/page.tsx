@@ -3,9 +3,21 @@ import { use, useState, useRef, useEffect } from "react";
 import { Button } from "@mui/material";
 import { Edit as EditIcon } from "@mui/icons-material";
 import { FaCloudUploadAlt, FaTrash } from "react-icons/fa";
-import { patch } from "../../../../../ultils/request";
 import { ICourseCreate } from "../../../interfaces/ICourseCreate";
 import Image from "next/image";
+import {
+  loadCourseData,
+  updateFormData,
+  validateFileSize,
+  simulateUpload,
+  prepareFormData,
+  submitCourseUpdate,
+  getImageFileName,
+  getImageSrc,
+  initializeFormData,
+  createImagePreview,
+  revokeImagePreview,
+} from "../../services/EditLessonService";
 
 interface PageProps {
   params: Promise<{
@@ -13,106 +25,82 @@ interface PageProps {
   }>;
 }
 
-// Mock data function
-const fetchCourseData = (id: string) => {
-  return {
-    userId: 1,
-    title: "Lập trình Web với HTML, CSS, JavaScript",
-    description: "Khóa học cung cấp kiến thức cơ bản về phát triển web từ HTML, CSS đến JavaScript. Học viên sẽ được thực hành xây dựng các trang web thực tế.",
-    target: "Người mới bắt đầu muốn học lập trình web\nHọc viên muốn củng cố kiến thức nền tảng\nNgười chuyển ngành sang IT",
-    result: "Xây dựng được website hoàn chỉnh\nNắm vững HTML5, CSS3, JavaScript ES6\nHiểu về responsive design và UI/UX",
-    image: "course_online_1.jpg",
-    duration: 40,
-    price: 1200000,
-    type: "video",
-    discountPercent: 20,
-  };
-};
 
 export default function EditCoursePage({ params }: PageProps) {
   const { id } = use(params);
-  const [formData, setFormData] = useState<ICourseCreate>({
-    userId: 1,
-    title: "",
-    description: "",
-    target: "",
-    result: "",
-    image: "",
-    duration: 0,
-    price: 0,
-    type: "video",
-    discountPercent: 0,
-  });
+  const [formData, setFormData] = useState<ICourseCreate>(initializeFormData());
+  const [initialData, setInitialData] = useState<ICourseCreate | null>(null);
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const [uploadProgress, setUploadProgress] = useState<number>(0);
   const [existingImage, setExistingImage] = useState<string>("");
+  const [imagePreview, setImagePreview] = useState<string>("");
   const [loading, setLoading] = useState(true);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    const loadCourseData = () => {
+    const fetchCourseData = async () => {
       try {
-        const data = fetchCourseData(id);
-        setFormData(data);
-        setExistingImage(data.image);
-        setLoading(false);
+        setLoading(true);
+        const result = await loadCourseData(id);
+        
+        if (result) {
+          setInitialData(result.initialData);
+          setFormData(result.initialData);
+          setExistingImage(result.existingImage);
+        }
       } catch (error) {
-        console.error("Error fetching course:", error);
+        console.error("Error:", error);
+      } finally {
         setLoading(false);
-        alert("Có lỗi xảy ra khi tải dữ liệu khóa học!");
       }
     };
 
-    loadCourseData();
+    fetchCourseData();
   }, [id]);
+
+  // Cleanup: revoke preview URL when component unmounts or imagePreview changes
+  useEffect(() => {
+    return () => {
+      if (imagePreview) {
+        revokeImagePreview(imagePreview);
+      }
+    };
+  }, [imagePreview]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: name === "duration" || name === "price" || name === "discountPercent"
-        ? parseFloat(value) || 0
-        : value,
-    }));
+    setFormData((prev) => updateFormData(prev, name, value));
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      if (file.size > 25 * 1024 * 1024) {
-        alert("Kích thước file không được vượt quá 25 MB");
+      if (!validateFileSize(file)) {
         return;
       }
+      // Revoke previous preview URL if exists
+      if (imagePreview) {
+        revokeImagePreview(imagePreview);
+      }
+      // Create new preview URL
+      const previewUrl = createImagePreview(file);
+      setImagePreview(previewUrl);
       setUploadedFile(file);
       setUploadProgress(0);
-      simulateUpload();
-      setFormData((prev) => ({
-        ...prev,
-        image: file.name,
-      }));
+      simulateUpload(setUploadProgress);
       setExistingImage("");
     }
   };
 
-  const simulateUpload = () => {
-    let progress = 0;
-    const interval = setInterval(() => {
-      progress += 10;
-      setUploadProgress(progress);
-      if (progress >= 100) {
-        clearInterval(interval);
-      }
-    }, 200);
-  };
-
   const handleDeleteFile = () => {
+    // Revoke preview URL to free memory
+    if (imagePreview) {
+      revokeImagePreview(imagePreview);
+      setImagePreview("");
+    }
     setUploadedFile(null);
     setUploadProgress(0);
     setExistingImage("");
-    setFormData((prev) => ({
-      ...prev,
-      image: "",
-    }));
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }
@@ -126,32 +114,43 @@ export default function EditCoursePage({ params }: PageProps) {
     e.preventDefault();
     const file = e.dataTransfer.files?.[0];
     if (file) {
-      if (file.size > 25 * 1024 * 1024) {
-        alert("Kích thước file không được vượt quá 25 MB");
+      if (!validateFileSize(file)) {
         return;
       }
+      // Revoke previous preview URL if exists
+      if (imagePreview) {
+        revokeImagePreview(imagePreview);
+      }
+      // Create new preview URL
+      const previewUrl = createImagePreview(file);
+      setImagePreview(previewUrl);
       setUploadedFile(file);
       setUploadProgress(0);
-      simulateUpload();
-      setFormData((prev) => ({
-        ...prev,
-        image: file.name,
-      }));
+      simulateUpload(setUploadProgress);
       setExistingImage("");
     }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("FormData:", formData);
-    // try {
-    //   const response = await patch(`courses/${id}`, formData);
-    //   console.log("Response:", response);
-    //   alert("Cập nhật khóa học thành công!");
-    // } catch (error) {
-    //   console.error("Error:", error);
-    //   alert("Có lỗi xảy ra khi cập nhật khóa học!");
-    // }
+    
+    if (!initialData) return;
+
+    const { formDataToSend, hasChanges } = prepareFormData(formData, initialData, uploadedFile);
+
+    if (!hasChanges) {
+      alert("Không có thay đổi nào!");
+      return;
+    }
+
+    const result = await submitCourseUpdate(id, formDataToSend);
+    
+    if (result.isSuccess) {
+      alert("Cập nhật khóa học thành công!");
+    } else {
+      console.error("Error:", result.error);
+      alert(result.error || 'Có lỗi xảy ra khi cập nhật khóa học!');
+    }
   };
 
   if (loading) {
@@ -238,14 +237,17 @@ export default function EditCoursePage({ params }: PageProps) {
                 <div className="flex items-center justify-between bg-gray-50 p-3 rounded-lg">
                   <div className="flex items-center gap-3">
                     <Image
-                      src={`/src/assets/images/${existingImage}`}
+                      src={getImageSrc(existingImage)}
                       alt="Course"
                       width={80}
                       height={80}
                       className="w-20 h-20 object-cover rounded"
+                      unoptimized
                     />
                     <div className="text-left">
-                      <div className="text-sm font-medium text-gray-900">{existingImage}</div>
+                      <div className="text-sm font-medium text-gray-900 break-all">
+                        {getImageFileName(existingImage)}
+                      </div>
                       <div className="text-xs text-gray-500">Ảnh hiện tại</div>
                     </div>
                   </div>
@@ -298,11 +300,20 @@ export default function EditCoursePage({ params }: PageProps) {
               <div className="space-y-3">
                 <div className="flex items-center justify-between bg-gray-50 p-3 rounded-lg">
                   <div className="flex items-center gap-3">
-                    <div className="text-blue-500">
-                      <svg className="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clipRule="evenodd" />
-                      </svg>
-                    </div>
+                    {imagePreview ? (
+                      <Image
+                        src={imagePreview}
+                        alt="Preview"
+                        width={80}
+                        height={80}
+                        className="w-20 h-20 object-cover rounded"
+                        unoptimized
+                      />
+                    ) : (
+                      <div className="w-20 h-20 bg-gray-200 rounded flex items-center justify-center">
+                        <FaCloudUploadAlt className="text-gray-400 text-2xl" />
+                      </div>
+                    )}
                     <div className="text-left">
                       <div className="text-sm font-medium text-gray-900">{uploadedFile.name}</div>
                       <div className="text-xs text-gray-500">{(uploadedFile.size / 1024).toFixed(2)} KB</div>
@@ -350,7 +361,7 @@ export default function EditCoursePage({ params }: PageProps) {
             </label>
             <select
               name="type"
-              value={formData.type}
+              value={formData.type || "video"}
               onChange={(e) => setFormData(prev => ({ ...prev, type: e.target.value }))}
               className="w-full px-4 py-2 border border-gray-300 rounded-[5px] focus:outline-none focus:border-[var(--color-main-admin)] bg-white"
             >
