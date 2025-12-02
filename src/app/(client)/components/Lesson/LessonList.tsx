@@ -1,25 +1,19 @@
 import LessonItem from "./LessonItem";
-
-interface Lesson {
-  title: string;
-  videoUrl: string;
-  duration: number;
-  orderIndex: number;
-}
+import { ILesson } from "@/app/(client)/interfaces/ILesson";
 
 type Props = {
   isCollapsed: boolean;
-  lessons: Lesson[];
+  lessons: ILesson[];
 };
 
 function LessonList({ isCollapsed, lessons }: Props) {
-  const collapsed = "max-h-0 opacity-0 -translate-y-2 pointer-events-none";
+  const collapsed = "hidden pointer-events-none";
   const expanded =
-    "max-h-[1000px] opacity-100 translate-y-0 pointer-events-auto";
+    "animate-tab-fade-in opacity-100 pointer-events-auto";
 
   return (
     <ul
-      className={`overflow-hidden transform transition-[max-height,opacity,transform] duration-300 ease-in-out ${
+      className={`${
         isCollapsed ? expanded : collapsed
       }`}
     >

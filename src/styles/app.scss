@@ -1,8 +1,8 @@
-@import "./_variable";
-@import "./components/footer/footer";
-@import "./components/button/button";
-@import "./components/animation/tab_fade_in";
-@import "./components/container/container";
+@use "./_variable" as *;
+@use "./components/footer/footer" as *;
+@use "./components/button/button" as *;
+@use "./components/animation/tab_fade_in" as *;
+@use "./components/container/container" as *;
 
 body {
   font-family: var(--font-be-vietnam-pro);

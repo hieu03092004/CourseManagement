@@ -8,8 +8,7 @@
         "Hyper Text Markup Language",
         "Hyper Text Markup Language"
       ],
-      "correctAnswer": 2,
-      "orderIndex": 1
+      "trueAnswer": 2
     },
     {
       "lessonId": 2,
@@ -20,7 +19,6 @@
         "Google",
         "Microsoft"
       ],
-      "correctAnswer": 0,
-      "orderIndex": 2
+      "trueAnswer": 0
     }
 ]

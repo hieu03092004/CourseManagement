@@ -4,7 +4,7 @@ import { FaPlus, FaCopy, FaTrash } from "react-icons/fa6";
 import { Add as AddIcon } from "@mui/icons-material";
 import { Button } from "@mui/material";
 import { post } from "../../../../../ultils/request";
-import QuizManager, { QuizCard } from "./helpers/createQuizz";
+import QuizManager, { QuizCard } from "./Services/createQuizz";
 interface PageProps {
     params: Promise<{
         id: string;
@@ -60,26 +60,14 @@ export default function CreateQuizzlePage({ params }: PageProps) {
         setQuizCards([...updatedCards]);
     };
 
-    const handleSubmit =  (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        const payload = quizCards.map((card, index) => {
-            const correctAnswerIndex = card.options.findIndex(
-                (opt) => opt.id === card.correctOption
-            );
-
-            return {
-                lessonId: parseInt(id),
-                question: card.question,
-                answers: card.options.map((opt) => opt.text),
-                correctAnswer: correctAnswerIndex,
-                orderIndex: index + 1,
-            };
-        });
-
-        // console.log("Quiz Name:", quizName);
-        //console.log("Payload:", payload);
-        //console.log("Payload JSON:", JSON.stringify(payload, null, 2));
+        // Update quizManager with current cards
+        quizManagerRef.current.setCards(quizCards);
+        
+        // Transform data to backend format
+        const payload = quizManagerRef.current.prepareDataForBackend(id);
 
         try {
             // const response = await post("quizzes", payload);

@@ -5,102 +5,53 @@ import { Add as AddIcon } from "@mui/icons-material";
 import Link from "next/link";
 import Filter from "./components/Filter";
 import CardList from "./components/CardList";
-import { Course } from "../interfaces/course";
+import { Course } from "../interfaces/CourseVideo/ICourseVideo";
+import { get } from "../../../ultils/request";
+import { handleResponse, getErrorMessage } from "../../../../../helpers/api/response/handleResponse";
+import { IApiResponse } from "../../../../../helpers/api/response/IResponse";
 
 const CoursesPage = () => {
   const [courses, setCourses] = useState<Course[]>([]);
   const [filteredCourses, setFilteredCourses] = useState<Course[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [priceFilter, setPriceFilter] = useState("all");
+  const [loading, setLoading] = useState(true);
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
 
-  // Mock data - replace with actual API call
+  const fetchCourses = async () => {
+    try {
+      setLoading(true);
+      const result = await get('/admin/courses/getAll') as IApiResponse<Course[]>;
+      const { isSuccess, data, error } = handleResponse(result);
+      
+      if (isSuccess && data) {
+        setCourses(data);
+        setFilteredCourses(data);
+      } else {
+        const errorMessage = error?.message || 'Có lỗi xảy ra khi tải danh sách khóa học!';
+        console.error("Error:", error);
+        alert(errorMessage);
+        setCourses([]);
+        setFilteredCourses([]);
+      }
+    } catch (error) {
+      const errorMessage = getErrorMessage(error);
+      console.error("Error:", error);
+      alert(errorMessage);
+      setCourses([]);
+      setFilteredCourses([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const mockCourses: Course[] = [
-      {
-        id: "1",
-        name: "Lập trình Python cơ bản",
-        description:
-          "Khóa học giới thiệu về ngôn ngữ lập trình Python, từ cơ bản đến nâng cao.",
-        instructor: "Nguyễn Văn A",
-        lectures: 24,
-        students: 120,
-        rating: 4.5,
-        reviews: 350,
-        price: 7000000,
-        originalPrice: 14000000,
-        image: "/src/assets/images/course_img_demo.png",
-      },
-      {
-        id: "2",
-        name: "Thiết kế Web với React",
-        description:
-          "Học cách xây dựng ứng dụng web hiện đại sử dụng React và các công nghệ liên quan.",
-        instructor: "Trần Thị B",
-        lectures: 30,
-        students: 85,
-        rating: 4.8,
-        reviews: 280,
-        price: 8000000,
-        originalPrice: 16000000,
-        image: "/src/assets/images/course_img_demo.png",
-      },
-      {
-        id: "3",
-        name: "Phân tích dữ liệu với Python",
-        description:
-          "Khóa học về phân tích và trực quan hóa dữ liệu sử dụng Python.",
-        instructor: "Lê Văn C",
-        lectures: 36,
-        students: 65,
-        rating: 4.7,
-        reviews: 200,
-        price: 9000000,
-        originalPrice: 18000000,
-        image: "/src/assets/images/course_img_demo.png",
-      },
-      {
-        id: "4",
-        name: "Machine Learning cơ bản",
-        description: "Giới thiệu về Machine Learning và các thuật toán cơ bản.",
-        instructor: "Phạm Thị D",
-        lectures: 40,
-        students: 90,
-        rating: 4.9,
-        reviews: 450,
-        price: 10000000,
-        originalPrice: 20000000,
-        image: "/src/assets/images/course_img_demo.png",
-      },
-      {
-        id: "5",
-        name: "JavaScript nâng cao",
-        description: "Khóa học JavaScript từ cơ bản đến nâng cao.",
-        instructor: "Hoàng Thị E",
-        lectures: 28,
-        students: 150,
-        rating: 4.6,
-        reviews: 320,
-        price: 4500000,
-        originalPrice: 9000000,
-        image: "/src/assets/images/course_img_demo.png",
-      },
-      {
-        id: "6",
-        name: "Node.js Backend Development",
-        description: "Xây dựng ứng dụng backend với Node.js và Express.",
-        instructor: "Nguyễn Văn F",
-        lectures: 35,
-        students: 95,
-        rating: 4.7,
-        reviews: 280,
-        price: 12000000,
-        originalPrice: 24000000,
-        image: "/src/assets/images/course_img_demo.png",
-      },
-    ];
-    setCourses(mockCourses);
-    setFilteredCourses(mockCourses);
-  }, []);
+    fetchCourses();
+  }, [refreshTrigger]);
+
+  const handleCourseDeleted = () => {
+    setRefreshTrigger(prev => prev + 1);
+  };
 
   // Filter courses based on search and price
   useEffect(() => {
@@ -157,7 +108,13 @@ const CoursesPage = () => {
         onPriceFilterChange={setPriceFilter}
       />
 
-      <CardList courses={filteredCourses} />
+      {loading ? (
+        <Box sx={{ textAlign: "center", py: 4 }}>
+          <Typography variant="body1">Đang tải dữ liệu...</Typography>
+        </Box>
+      ) : (
+        <CardList courses={filteredCourses} onCourseDeleted={handleCourseDeleted} />
+      )}
     </Box>
   );
 };

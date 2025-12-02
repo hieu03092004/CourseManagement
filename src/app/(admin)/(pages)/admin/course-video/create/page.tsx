@@ -1,10 +1,17 @@
 "use client";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Button } from "@mui/material";
 import { Add as AddIcon } from "@mui/icons-material";
 import { FaCloudUploadAlt, FaTrash } from "react-icons/fa";
-import { post } from "../../../../ultils/request";
 import { ICourseCreate } from "../../interfaces/ICourseCreate";
+import { post } from "../../../../ultils/request";
+import { ApiResponse } from "../../../../helpers/handleReponse";
+import Image from "next/image";
+import {
+  createImagePreview,
+  revokeImagePreview,
+  validateFileSize as validateFileSizeHelper,
+} from "../services/EditLessonService";
 
 export default function CreateCoursePage() {
   const [formData, setFormData] = useState<ICourseCreate>({
@@ -21,6 +28,7 @@ export default function CreateCoursePage() {
   });
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const [uploadProgress, setUploadProgress] = useState<number>(0);
+  const [imagePreview, setImagePreview] = useState<string>("");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -36,10 +44,16 @@ export default function CreateCoursePage() {
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      if (file.size > 25 * 1024 * 1024) {
-        alert("Kích thước file không được vượt quá 25 MB");
+      if (!validateFileSizeHelper(file)) {
         return;
       }
+      // Revoke previous preview URL if exists
+      if (imagePreview) {
+        revokeImagePreview(imagePreview);
+      }
+      // Create new preview URL
+      const previewUrl = createImagePreview(file);
+      setImagePreview(previewUrl);
       setUploadedFile(file);
       setUploadProgress(0);
       simulateUpload();
@@ -62,6 +76,11 @@ export default function CreateCoursePage() {
   };
 
   const handleDeleteFile = () => {
+    // Revoke preview URL to free memory
+    if (imagePreview) {
+      revokeImagePreview(imagePreview);
+      setImagePreview("");
+    }
     setUploadedFile(null);
     setUploadProgress(0);
     setFormData((prev) => ({
@@ -81,10 +100,16 @@ export default function CreateCoursePage() {
     e.preventDefault();
     const file = e.dataTransfer.files?.[0];
     if (file) {
-      if (file.size > 25 * 1024 * 1024) {
-        alert("Kích thước file không được vượt quá 25 MB");
+      if (!validateFileSizeHelper(file)) {
         return;
       }
+      // Revoke previous preview URL if exists
+      if (imagePreview) {
+        revokeImagePreview(imagePreview);
+      }
+      // Create new preview URL
+      const previewUrl = createImagePreview(file);
+      setImagePreview(previewUrl);
       setUploadedFile(file);
       setUploadProgress(0);
       simulateUpload();
@@ -95,29 +120,73 @@ export default function CreateCoursePage() {
     }
   };
 
+  // Cleanup: revoke preview URL when component unmounts or imagePreview changes
+  useEffect(() => {
+    return () => {
+      if (imagePreview) {
+        revokeImagePreview(imagePreview);
+      }
+    };
+  }, [imagePreview]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("FormData:", formData);
-    // try {
-    //   const response = await post("courses", formData);
-    //   console.log("Response:", response);
-    //   alert("Tạo khóa học thành công!");
-    //   setFormData({
-    //     userId: 1,
-    //     title: "",
-    //     description: "",
-    //     target: "",
-    //     result: "",
-    //     image: "",
-    //     duration: 0,
-    //     price: 0,
-    //     type: "online",
-    //     discountPercent: 0,
-    //   });
-    // } catch (error) {
-    //   console.error("Error:", error);
-    //   alert("Có lỗi xảy ra khi tạo khóa học!");
-    // }
+
+    try {
+      const body = new FormData();
+      body.append("user_id", String(formData.userId));
+      body.append("title", formData.title);
+      body.append("description", formData.description);
+      body.append("target", formData.target);
+      body.append("result", formData.result);
+      body.append("duration", String(formData.duration));
+      body.append("price", String(formData.price));
+      body.append("type", formData.type);
+      body.append("discount_percent", String(formData.discountPercent));
+
+      if (uploadedFile) {
+        body.append("image", uploadedFile);
+      }
+
+      const result = await post('/admin/courses/create', body) as ApiResponse;
+      
+      if (result.success) {
+        alert("Tạo khoá học thành công!");
+        setFormData({
+          userId: 1,
+          title: "",
+          description: "",
+          target: "",
+          result: "",
+          image: "",
+          duration: 0,
+          price: 0,
+          type: "video",
+          discountPercent: 0,
+        });
+        // Revoke preview URL to free memory
+        if (imagePreview) {
+          revokeImagePreview(imagePreview);
+          setImagePreview("");
+        }
+        setUploadedFile(null);
+        setUploadProgress(0);
+        if (fileInputRef.current) {
+          fileInputRef.current.value = "";
+        }
+      } else {
+        // Handle validation errrs
+        if (result.error.code === 'VALIDATION_ERROR' && result.error.errors) {
+          alert(`${result.error.message}`);
+        } else {
+          alert(`Lỗi: ${result.error.message || 'Có lỗi xảy ra khi tạo khóa học!'}`);
+        }
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      const errorMessage = error instanceof Error ? error.message : 'Có lỗi xảy ra khi tạo khóa học!';
+      alert(errorMessage);
+    }
   };
 
   return (
@@ -217,11 +286,20 @@ export default function CreateCoursePage() {
               <div className="space-y-3">
                 <div className="flex items-center justify-between bg-gray-50 p-3 rounded-lg">
                   <div className="flex items-center gap-3">
-                    <div className="text-blue-500">
-                      <svg className="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clipRule="evenodd" />
-                      </svg>
-                    </div>
+                    {imagePreview ? (
+                      <Image
+                        src={imagePreview}
+                        alt="Preview"
+                        width={80}
+                        height={80}
+                        className="w-20 h-20 object-cover "
+                        unoptimized
+                      />
+                    ) : (
+                      <div className="w-20 h-20 bg-gray-200 rounded flex items-center justify-center">
+                        <FaCloudUploadAlt className="text-gray-400 text-2xl" />
+                      </div>
+                    )}
                     <div className="text-left">
                       <div className="text-sm font-medium text-gray-900">{uploadedFile.name}</div>
                       <div className="text-xs text-gray-500">{(uploadedFile.size / 1024).toFixed(2)} KB</div>
