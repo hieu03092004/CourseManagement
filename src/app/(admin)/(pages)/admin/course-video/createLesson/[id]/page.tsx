@@ -24,7 +24,7 @@ import {
   addNewCard,
   duplicateCard,
   initializeInitialState,
-} from "../../services/CreateLessonService";
+} from "../../services/createLesson";
 import { handleResponse, getErrorMessage } from "../../../../../../../helpers/api/response/handleResponse";
 import { IApiResponse } from "../../../../../../../helpers/api/response/IResponse";
 

@@ -77,3 +77,50 @@ export interface Course {
   image: string;
 }
 
+export interface ICourseDetailsPageProps {
+  params: Promise<{
+    id: string;
+  }>;
+}
+
+/**
+ * Interface cho Lesson data từ API getDataDetailCourse
+ * Mapping từ Table lesson
+ */
+export interface ILesson {
+  id: number;
+  title: string;
+  videoUrl: string;
+  duration: number;
+  orderIndex: number;
+}
+
+/**
+ * Interface cho Topic data từ API getDataDetailCourse
+ * Mapping từ Table course_modules
+ */
+export interface ITopic {
+  title: string;
+  orderIndex: number;
+  lessons: ILesson[];
+}
+
+/**
+ * Interface cho Course Detail Data từ API /admin/courses/details/{id}
+ * Structure data FE cần bên BE trả ra cho trang details và edit
+ */
+export interface ICourseDetailData {
+  title: string;
+  description: string;
+  target: string;
+  result: string;
+  image: string;
+  duration: number;
+  price: number;
+  type: string;
+  discountPercent: number;
+  rating: number;
+  studentCount: number;
+  reviews: number;
+  topics: ITopic[];
+}

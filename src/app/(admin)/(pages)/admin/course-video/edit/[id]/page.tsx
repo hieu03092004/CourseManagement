@@ -17,7 +17,7 @@ import {
   initializeFormData,
   createImagePreview,
   revokeImagePreview,
-} from "../../services/EditLessonService";
+} from "../../services/editLesson";
 
 interface PageProps {
   params: Promise<{
@@ -42,7 +42,7 @@ export default function EditCoursePage({ params }: PageProps) {
       try {
         setLoading(true);
         const result = await loadCourseData(id);
-        
+        console.log(result);
         if (result) {
           setInitialData(result.initialData);
           setFormData(result.initialData);

@@ -11,6 +11,37 @@ Struture Data FE cần lấy
     price: 1200000,
     type: "video",
     discountPercent: 20,
+    rating: 4,
+    studentCount : 2157,
+    reviews:4,
+    topics: [
+      {
+        "title": "Phần 1:Kiểu dữ liệu, biến, vòng lặp, hàm",
+        "orderIndex": 1,
+        "lessons": [
+          {
+            "id": 1,
+            "title": "Lập trình C",
+            "videoUrl": "/src/assets/videos/1762481529575_487qkl.mp4",
+            "duration": 10,
+            "orderIndex": 1
+          }
+        ]
+      },
+      {
+        "title": "Phần 2:Kiểu dữ liệu, biến, vòng lặp, hàm",
+        "orderIndex": 2,
+        "lessons": [
+          {
+            "id": 2,
+            "title": "Bài 1. Hướng dẫn cài đặt phần mềm DEV C++ để lập trình",
+            "videoUrl": "/src/assets/videos/1762481652483_13ndh.mp4",
+            "duration": 600,
+            "orderIndex": 1
+          }
+        ]
+      }
+    ]
 };
 Mapping value tương ứng của các key ứng với structure data ben FE sang Table bên BE
 Structure Table BE

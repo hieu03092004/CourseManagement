@@ -1,19 +1,17 @@
 import { ICourseCreate } from "../../interfaces/ICourseCreate";
+import { ICourseDetailData } from "../../interfaces/CourseVideo/ICourseVideo";
 import { get, patch } from "../../../../ultils/request";
 import { handleResponse, getErrorMessage } from "../../../../../../helpers/api/response/handleResponse";
 import { IApiResponse } from "../../../../../../helpers/api/response/IResponse";
 
 const MAX_FILE_SIZE = 25 * 1024 * 1024; // 25 MB
 
-/**
- * Load course data from API
- */
 export const loadCourseData = async (id: string): Promise<{
   initialData: ICourseCreate;
   existingImage: string;
 } | null> => {
   try {
-    const result = await get(`/admin/courses/details/${id}`) as IApiResponse<ICourseCreate>;
+    const result = await get(`/admin/courses/details/${id}`) as IApiResponse<ICourseDetailData>;
     const { isSuccess, data, error } = handleResponse(result);
     
     if (isSuccess && data) {

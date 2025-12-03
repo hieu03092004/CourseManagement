@@ -15,7 +15,9 @@ import {
   CircularProgress,
 } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import { Quiz } from "../../interfaces/IQuiz";
+import { Quiz } from "../../interfaces/Quiz/IQuiz";
+import { transformedQuiz } from "../services/getQuizDetail";
+import { getDataQuizDetail } from "../helpers/getDataQuizDetail";
 
 export default function QuizDetailPage() {
   const params = useParams();
@@ -24,81 +26,27 @@ export default function QuizDetailPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Mock data - replace with API call
-    const mockQuizzes: Quiz[] = [
-      {
-        id: "1",
-        lessonName: "Giới thiệu về React",
-        quizName: "Quiz cơ bản React",
-        courseName: "Lập trình React",
-        status: "active",
-        questions: [
-          {
-            id: "q1",
-            question: "React là gì?",
-            answers: [
-              { id: "a1", content: "Thư viện JavaScript", isCorrect: true },
-              { id: "a2", content: "Ngôn ngữ lập trình", isCorrect: false },
-              { id: "a3", content: "Framework CSS", isCorrect: false },
-              { id: "a4", content: "Database", isCorrect: false },
-            ],
-          },
-          {
-            id: "q2",
-            question: "JSX là gì?",
-            answers: [
-              { id: "a1", content: "JavaScript XML", isCorrect: true },
-              { id: "a2", content: "Java Syntax", isCorrect: false },
-              { id: "a3", content: "JSON Extended", isCorrect: false },
-              { id: "a4", content: "JavaScript Express", isCorrect: false },
-            ],
-          },
-        ],
-      },
-      {
-        id: "2",
-        lessonName: "Hooks trong React",
-        quizName: "Quiz về React Hooks",
-        courseName: "Lập trình React",
-        status: "active",
-        questions: [
-          {
-            id: "q1",
-            question: "useState dùng để làm gì?",
-            answers: [
-              { id: "a1", content: "Quản lý state", isCorrect: true },
-              { id: "a2", content: "Xử lý side effect", isCorrect: false },
-              { id: "a3", content: "Tạo context", isCorrect: false },
-              { id: "a4", content: "Gọi API", isCorrect: false },
-            ],
-          },
-        ],
-      },
-      {
-        id: "3",
-        lessonName: "Node.js cơ bản",
-        quizName: "Quiz Node.js",
-        courseName: "Lập trình Node.js",
-        status: "inactive",
-        questions: [
-          {
-            id: "q1",
-            question: "Node.js chạy trên môi trường nào?",
-            answers: [
-              { id: "a1", content: "Server", isCorrect: true },
-              { id: "a2", content: "Browser", isCorrect: false },
-              { id: "a3", content: "Mobile", isCorrect: false },
-              { id: "a4", content: "Desktop", isCorrect: false },
-            ],
-          },
-        ],
-      },
-    ];
+    const fetchQuiz = async () => {
+      try {
+        setLoading(true);
+        const backendData = await getDataQuizDetail(params.id as string);
 
-    // Find quiz by id
-    const foundQuiz = mockQuizzes.find((q) => q.id === params.id);
-    setQuiz(foundQuiz || null);
-    setLoading(false);
+        if (backendData) {
+          setQuiz(transformedQuiz(backendData));
+        } else {
+          setQuiz(null);
+        }
+      } catch (error) {
+        console.error("Error fetching quiz:", error);
+        setQuiz(null);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (params.id) {
+      fetchQuiz();
+    }
   }, [params.id]);
 
   const getStatusDisplay = (status: Quiz["status"]) => {
@@ -230,11 +178,12 @@ export default function QuizDetailPage() {
         ))}
 
         <Box sx={{ mt: 3, display: "flex", gap: 2 }}>
-          <Button variant="contained" color="primary">
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={() => router.push(`/admin/quizzles/edit/${quiz.id}`)}
+          >
             Chỉnh sửa
-          </Button>
-          <Button variant="outlined" color="error">
-            Xóa bài quiz
           </Button>
         </Box>
       </Paper>

@@ -1,0 +1,54 @@
+{
+    "id": "1",
+    "lessonName": "Giới thiệu về React",
+    "quizName": "Quiz cơ bản React",
+    "courseName": "Lập trình React",
+    "status": "active",
+  "questions": [
+    {
+        "questionId": 1,
+      "questionName": "HTML là viết tắt của...?",
+      "answers": [
+        {
+            "answerId": 1,
+            "answerName": "Hyperlinks and Text Markup Language"
+        },
+        {
+            "answerId": 2,
+            "answerName": "Home Tool Markup Language"
+        },
+        {
+            "answerId": 3,
+            "answerName": "Hyper Text Markup Language"
+        },
+        {
+            "answerId": 4,
+            "answerName": "Hyper Text Markup Language"
+        }
+      ],
+      "trueAnswer": 2
+    },
+    {
+      "questionName": "Ai là người đưa ra các tiêu chuẩn Web?",
+      "answers": [
+        {
+            "answerId": 5,
+            "answerName": "Tổ chức World Wide Web Consortium (W3C)"
+        },
+        {
+            "answerId": 6,
+            "answerName": "Apple"
+        },
+        {
+            "answerId": 7,
+            "answerName": "Google"
+        },
+        {
+            "answerId": 8,
+            "answerName": "Microsoft"
+        }
+      ],
+      "trueAnswer": 0
+    }
+  ]
+}
