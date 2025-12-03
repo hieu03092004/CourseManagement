@@ -2,10 +2,11 @@
 import { useState } from 'react';
 import React from 'react';
 import Link from 'next/link';
-import { post } from '../../../../(admin)/ultils/request';
-import { useRouter } from 'next/navigation';
+import { post } from '@/app/(admin)/ultils/request';
 import BreadCump from '@/app/(client)/components/BreadCump/BreadCump';
 import ButtonInput from '@/app/(client)/components/Button/btn_input';
+import { handleResponse } from '@/helpers/api/response/handleResponse';
+import { IApiResponse } from '@/helpers/api/response/IResponse';
 type SvgProps = React.ComponentProps<'svg'>;
 
 const EyeIcon = (props: SvgProps) => (
@@ -26,7 +27,6 @@ const EyeOffIcon = (props: SvgProps) => (
 export default function RegisterPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const router=useRouter();
   const [formData, setFormData] = useState({
     fullName: '',
     userName: '',
@@ -52,10 +52,9 @@ export default function RegisterPage() {
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    let resgiterStatus = true;
 
     if (formData.password !== formData.confirmPassword) {
       alert('Mật khẩu xác nhận không chính xác');
@@ -63,7 +62,7 @@ export default function RegisterPage() {
       return;
     }
 
-    const dataToSend = {
+    const payload = {
       fullName: formData.fullName,
       userName: formData.userName,
       email: formData.email,
@@ -72,20 +71,18 @@ export default function RegisterPage() {
     };
 
     try {
-      //console.log(dataToSend);
-      resgiterStatus=true;
-      if(resgiterStatus){
-        router.push('/member/login');
-      }
-      // const result = await post('api/register', dataToSend);
+      const response = await post("/auth/register", payload) as IApiResponse<unknown>;
+      const { isSuccess, error } = handleResponse(response);
 
-      // if (result.success || result.id) {
-      //   console.log('Registration successful:', result);
-      //   alert('Đăng ký thành công!');
-      // } else {
-      //   console.error('Registration failed:', result);
-      //   alert('Đăng ký thất bại: ' + (result.message || 'Lỗi không xác định'));
-      // }
+      if (isSuccess) {
+        // Hiển thị: "Vui lòng kiểm tra email để xác thực tài khoản"
+        alert("Vui lòng kiểm tra email để xác thực tài khoản");
+      } else {
+        // Hiển thị lỗi từ BE
+        const errorMessage = error?.message || "Đăng ký thất bại!";
+        alert(errorMessage);
+      }
+      
     } catch (error) {
       console.error('Error during registration:', error);
       alert('Đã xảy ra lỗi khi đăng ký');

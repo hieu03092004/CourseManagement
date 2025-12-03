@@ -8,32 +8,11 @@ import { checkLogin } from '@/app/(client)/actions';
 import { useDispatch } from 'react-redux';
 import BreadCump from '@/app/(client)/components/BreadCump/BreadCump';
 import ButtonInput from '@/app/(client)/components/Button/btn_input';
+import { post } from '@/app/(admin)/ultils/request';
+import { handleResponse } from '@/helpers/api/response/handleResponse';
+import { IApiResponse } from '@/helpers/api/response/IResponse';
 
 type SvgProps = React.ComponentProps<'svg'>;
-
-// Mock login function - trả về data fix cứng
-const login = (email: string, password: string) => {
-  // Giả lập check login với data cứng
-  const mockUsers = [
-    {
-      id: "1",
-      email: "admin@example.com",
-      password: "123456",
-      fullName: "Nguyen Van A",
-      token: "mock-token-123"
-    },
-    {
-      id: "2",
-      email: "user@example.com",
-      password: "123456",
-      fullName: "Tran Thi B",
-      token: "mock-token-456"
-    }
-  ];
-
-  const user = mockUsers.find(u => u.email === email && u.password === password);
-  return user ? [user] : [];
-};
 
 const EyeIcon = (props: SvgProps) => (
   <svg {...props} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -54,22 +33,54 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const router=useRouter();
   const dispatch=useDispatch();
-  const handleSubmit=(e:React.FormEvent<HTMLFormElement>)=>{
+  const handleSubmit=async(e:React.FormEvent<HTMLFormElement>)=>{
     e.preventDefault();
     const email=(e.target as HTMLFormElement).email.value;
     const password=(e.target as HTMLFormElement).password.value;
-    const response= login(email,password);
-    console.log(response);
-    if(response.length>0){
-        router.push("/");
-        setCookie("id",response[0].id,1);
-        setCookie("fullName",response[0].fullName,1);
-        setCookie("email",response[0].email,1);
-        setCookie("token",response[0].token,1);
+    
+    const requestData = {
+      email,
+      password
+    };
+    
+    console.log("Request data:", requestData);
+    
+    try {
+      const response = await post("/auth/login", requestData) as IApiResponse<{
+        message: string;
+        token: string;
+        user: {
+          id: number;
+          email: string;
+          fullName: string;
+        };
+      }>;
+      
+      const { isSuccess, data, error } = handleResponse(response);
+      
+      // console.log("Response from BE:", { isSuccess, data, error });
+      
+      if (isSuccess && data) {
+        // Lưu thông tin user vào cookie
+        setCookie("id", String(data.user.id), 1);
+        setCookie("fullName", data.user.fullName, 1);
+        setCookie("email", data.user.email, 1);
+        setCookie("token", data.token, 1);
+        
+        // // Dispatch action login
         dispatch(checkLogin(true));
-    }
-    else{
-        alert("Tài khoản hoặc mật khẩu không chính xác");
+        
+        // Chuyển hướng về trang chủ
+        router.push("/");
+        
+        alert("Đăng nhập thành công!");
+      } else {
+        const errorMessage = error?.message || "Đăng nhập thất bại!";
+        alert(errorMessage);
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      alert("Có lỗi xảy ra khi đăng nhập!");
     }
 
 
