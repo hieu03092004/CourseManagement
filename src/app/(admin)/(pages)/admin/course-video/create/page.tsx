@@ -11,7 +11,7 @@ import {
   createImagePreview,
   revokeImagePreview,
   validateFileSize as validateFileSizeHelper,
-} from "../services/EditLessonService";
+} from "../services/editLesson";
 
 export default function CreateCoursePage() {
   const [formData, setFormData] = useState<ICourseCreate>({

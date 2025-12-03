@@ -1,0 +1,35 @@
+{
+    "title": "Học Lập Trình C qua 170 bài giảng, 350 bài tập thực hành và 200 câu trắc nghiệm (Update 2025)",
+    "description": "Khóa học lập trình C của 28Tech cung cấp trọng vẹn kiến thức lý thuyết và bài tập về ngôn ngữ lập trình C. Học viên được thực hành với 320 bài tập lập trình từ cơ bản tới nâng cao và 200 bài tập trắc nghiệm củng cố lý thuyết. Học viên sẽ làm bài và chấm bài tự động với website Hackerrank, các bài tập đều có lời giải chi tiết và học viên sẽ được hỗ trợ giải đáp khi gặp khó khăn.",
+    "rating": 4,
+    "studentCount"  : 2157,
+    "reviews":4,
+    "topics": [
+      {
+        "title": "Phần 1:Kiểu dữ liệu, biến, vòng lặp, hàm",
+        "orderIndex": 1,
+        "lessons": [
+          {
+            "id": 1,
+            "title": "Lập trình C",
+            "videoUrl": "/src/assets/videos/1762481529575_487qkl.mp4",
+            "duration": 10,
+            "orderIndex": 1
+          }
+        ]
+      },
+      {
+        "title": "Phần 2:Kiểu dữ liệu, biến, vòng lặp, hàm",
+        "orderIndex": 2,
+        "lessons": [
+          {
+            "id": 2,
+            "title": "Bài 1. Hướng dẫn cài đặt phần mềm DEV C++ để lập trình",
+            "videoUrl": "/src/assets/videos/1762481652483_13ndh.mp4",
+            "duration": 600,
+            "orderIndex": 1
+          }
+        ]
+      }
+    ]
+}

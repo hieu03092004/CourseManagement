@@ -1,10 +1,12 @@
 "use client";
 import { use, useState, useRef } from "react";
 import { FaPlus, FaCopy, FaTrash } from "react-icons/fa6";
-import { Add as AddIcon } from "@mui/icons-material";
-import { Button } from "@mui/material";
+import { Add as AddIcon, AccessTime } from "@mui/icons-material";
+import { Button, Dialog, DialogTitle, DialogContent, DialogActions, TextField } from "@mui/material";
 import { post } from "../../../../../ultils/request";
-import QuizManager, { QuizCard } from "./Services/createQuizz";
+import { handleResponse, getErrorMessage } from "../../../../../../../helpers/api/response/handleResponse";
+import { IApiResponse } from "../../../../../../../helpers/api/response/IResponse";
+import QuizManager, { QuizCard } from "../../services/createQuizz";
 interface PageProps {
     params: Promise<{
         id: string;
@@ -14,6 +16,9 @@ interface PageProps {
 export default function CreateQuizzlePage({ params }: PageProps) {
     const { id } = use(params);
     const [quizName, setQuizName] = useState("");
+    const [timeLimit, setTimeLimit] = useState<number>(0);
+    const [timeLimitInput, setTimeLimitInput] = useState<string>("00:00");
+    const [openTimeModal, setOpenTimeModal] = useState(false);
     const [quizCards, setQuizCards] = useState<QuizCard[]>([
         {
             id: "1",
@@ -60,6 +65,36 @@ export default function CreateQuizzlePage({ params }: PageProps) {
         setQuizCards([...updatedCards]);
     };
 
+    const convertTimeToSeconds = (timeString: string): number => {
+        const parts = timeString.split(":");
+        if (parts.length < 2) return 0;
+        const hours = parseInt(parts[0]) || 0;
+        const minutes = parseInt(parts[1]) || 0;
+        const seconds = parts.length === 3 ? (parseInt(parts[2]) || 0) : 0;
+        return hours * 3600 + minutes * 60 + seconds;
+    };
+
+    const convertSecondsToTime = (seconds: number): string => {
+        const hours = Math.floor(seconds / 3600);
+        const minutes = Math.floor((seconds % 3600) / 60);
+        return `${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}`;
+    };
+
+    const handleOpenTimeModal = () => {
+        setTimeLimitInput(convertSecondsToTime(timeLimit));
+        setOpenTimeModal(true);
+    };
+
+    const handleCloseTimeModal = () => {
+        setOpenTimeModal(false);
+    };
+
+    const handleSaveTimeLimit = () => {
+        const seconds = convertTimeToSeconds(timeLimitInput);
+        setTimeLimit(seconds);
+        setOpenTimeModal(false);
+    };
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
@@ -67,16 +102,22 @@ export default function CreateQuizzlePage({ params }: PageProps) {
         quizManagerRef.current.setCards(quizCards);
         
         // Transform data to backend format
-        const payload = quizManagerRef.current.prepareDataForBackend(id);
-
+        const payload = quizManagerRef.current.prepareDataForBackend(id, quizName, timeLimit);
         try {
-            // const response = await post("quizzes", payload);
-            // console.log("Response:", response);
-            console.log("Payload:", JSON.stringify(payload, null, 2));
-            alert("Tạo bài quiz thành công!");
+            const response = await post(`/admin/quizz/create/${id}`, payload) as IApiResponse;
+            const { isSuccess, error } = handleResponse(response);
+            
+            if (isSuccess) {
+                alert("Tạo bài quiz thành công!");
+            } else {
+                const errorMessage = error?.message || 'Có lỗi xảy ra khi tạo bài quiz!';
+                console.error("Error:", error);
+                alert(errorMessage);
+            }
         } catch (error) {
+            const errorMessage = getErrorMessage(error);
             console.error("Error:", error);
-            alert("Có lỗi xảy ra khi tạo bài quiz!");
+            alert(errorMessage);
         }
     };
 
@@ -87,15 +128,50 @@ export default function CreateQuizzlePage({ params }: PageProps) {
                 <div className="p-6 bg-gray-50 min-h-screen">
                     <div className="max-w-4xl mx-auto">
                         <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
-                            <input
-                                type="text"
-                                name="QuizName"
-                                placeholder="Tên bài quiz"
-                                value={quizName}
-                                onChange={(e) => setQuizName(e.target.value)}
-                                className="w-full text-3xl font-normal border-b border-gray-300 focus:border-[var(--color-main-admin)] outline-none pb-2 mb-4"
-                            />
+                            <div className="flex items-center gap-6 mb-4">
+                                <input
+                                    type="text"
+                                    name="title"
+                                    placeholder="Tên bài quiz"
+                                    value={quizName}
+                                    onChange={(e) => setQuizName(e.target.value)}
+                                    className="flex-1 text-3xl font-normal border-b border-gray-300 focus:border-[var(--color-main-admin)] outline-none pb-2"
+                                />
+                                <Button
+                                    type="button"
+                                    variant="outlined"
+                                    startIcon={<AccessTime />}
+                                    onClick={handleOpenTimeModal}
+                                    className="shrink-0"
+                                >
+                                    {timeLimit > 0 ? convertSecondsToTime(timeLimit) : "Thời gian"}
+                                </Button>
+                            </div>
                         </div>
+
+                        <Dialog open={openTimeModal} onClose={handleCloseTimeModal} maxWidth="sm" fullWidth>
+                            <DialogTitle>Thiết lập thời gian làm bài</DialogTitle>
+                            <DialogContent>
+                                <TextField
+                                    type="time"
+                                    label="Thời gian làm bài"
+                                    value={timeLimitInput}
+                                    onChange={(e) => setTimeLimitInput(e.target.value)}
+                                    inputProps={{
+                                        step: 60,
+                                    }}
+                                    fullWidth
+                                    margin="normal"
+                                    helperText={`Tương đương ${convertTimeToSeconds(timeLimitInput)} giây`}
+                                />
+                            </DialogContent>
+                            <DialogActions>
+                                <Button onClick={handleCloseTimeModal}>Hủy</Button>
+                                <Button onClick={handleSaveTimeLimit} variant="contained">
+                                    Lưu
+                                </Button>
+                            </DialogActions>
+                        </Dialog>
 
                         <div className="space-y-6">
                             {quizCards.map((card) => (

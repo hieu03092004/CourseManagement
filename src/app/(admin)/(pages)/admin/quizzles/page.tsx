@@ -6,9 +6,14 @@ import {
   Typography,
   Stack,
 } from "@mui/material";
+import { get } from "../../../ultils/request";
+import { handleResponse } from "../../../../../helpers/api/response/handleResponse";
+import { IApiResponse } from "../../../../../helpers/api/response/IResponse";
 import Table from "./components/Table";
 import Filter from "./components/Filter";
-import { Quiz } from "../interfaces/IQuiz";
+import { Quiz } from "../interfaces/Quiz/IQuiz";
+import { changeStatus } from "./services/changeStatus";
+import { deleteQuiz } from "./services/deleteQuiz";
 
 export default function QuizzlesPage() {
   const router = useRouter();
@@ -19,40 +24,29 @@ export default function QuizzlesPage() {
   const [courseFilter, setCourseFilter] = useState("all");
   const [statusFilter, setStatusFilter] = useState("all");
 
-  // Mock data
+  // Fetch quizzes from API
+  const fetchQuizzes = async () => {
+    try {
+      const response = await get("/admin/quizz/getAll") as IApiResponse<Quiz[]>;
+      console.log("Response:", response);
+      const { isSuccess, data, error } = handleResponse(response);
+
+      if (isSuccess && data) {
+        setQuizzes(data);
+        setFilteredQuizzes(data);
+      } else {
+        console.error("Error:", error);
+        const errorMessage = error?.message || 'Có lỗi xảy ra khi tải danh sách quiz!';
+        alert(errorMessage);
+      }
+    } catch (error) {
+      console.error("Error fetching quizzes:", error);
+      alert("Có lỗi xảy ra khi tải danh sách quiz!");
+    }
+  };
+
   useEffect(() => {
-    const mockQuizzes: Quiz[] = [
-      {
-        id: "1",
-        lessonName: "Giới thiệu về React",
-        quizName: "Quiz cơ bản React",
-        courseName: "Lập trình React",
-        status: "active",
-      },
-      {
-        id: "2",
-        lessonName: "Hooks trong React",
-        quizName: "Quiz về React Hooks",
-        courseName: "Lập trình React",
-        status: "active",
-      },
-      {
-        id: "3",
-        lessonName: "Node.js cơ bản",
-        quizName: "Quiz Node.js",
-        courseName: "Lập trình Node.js",
-        status: "inactive",
-      },
-      {
-        id: "4",
-        lessonName: "Node.js cơ bản",
-        quizName: "Quiz Node.js",
-        courseName: "Lập trình Node.js",
-        status: "inactive",
-      },
-    ];
-    setQuizzes(mockQuizzes);
-    setFilteredQuizzes(mockQuizzes);
+    fetchQuizzes();
   }, []);
 
   // Filter quizzes
@@ -85,9 +79,44 @@ export default function QuizzlesPage() {
     router.push(`/admin/quizzles/${quiz.id}`);
   };
 
-  const handleDelete = (quiz: Quiz) => {
+  const handleDelete = async (quiz: Quiz) => {
     if (confirm(`Bạn có chắc chắn muốn xóa bài quiz "${quiz.quizName}"?`)) {
-      setQuizzes(quizzes.filter((q) => q.id !== quiz.id));
+      try {
+        const response = await deleteQuiz(quiz.id);
+        const { isSuccess, error } = handleResponse(response);
+
+        if (isSuccess) {
+          await fetchQuizzes();
+          alert(`Xoá bài ${quiz.quizName} thành công`);
+        } else {
+          const errorMessage = error?.message || "Có lỗi xảy ra khi xóa bài quiz!";
+          alert(errorMessage);
+        }
+      } catch (error) {
+        console.error("Error deleting quiz:", error);
+        alert("Có lỗi xảy ra khi xóa bài quiz!");
+      }
+    }
+  };
+
+  const handleStatusChange = async (quizId: string, newStatus: "active" | "inactive") => {
+    try {
+      const response = await changeStatus({
+        status: newStatus,
+        quizzId: quizId,
+      });
+      const { isSuccess, error } = handleResponse(response);
+
+      if (isSuccess) {
+        await fetchQuizzes();
+        alert("Thay đổi trạng thái thành công!");
+      } else {
+        const errorMessage = error?.message || "Có lỗi xảy ra khi đổi trạng thái!";
+        alert(errorMessage);
+      }
+    } catch (error) {
+      console.error("Error changing status:", error);
+      alert("Có lỗi xảy ra khi đổi trạng thái!");
     }
   };
 
@@ -116,6 +145,7 @@ export default function QuizzlesPage() {
         quizzes={filteredQuizzes}
         onViewDetails={handleViewDetails}
         onDelete={handleDelete}
+        onStatusChange={handleStatusChange}
         page={page}
         onPageChange={setPage}
       />

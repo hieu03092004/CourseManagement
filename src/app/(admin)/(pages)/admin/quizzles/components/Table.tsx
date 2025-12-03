@@ -14,12 +14,13 @@ import {
   TablePagination,
 } from "@mui/material";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
-import { Quiz } from "../../interfaces/IQuiz";
+import { Quiz } from "../../interfaces/Quiz/IQuiz";
 
 interface TableProps {
   quizzes: Quiz[];
   onViewDetails: (quiz: Quiz) => void;
   onDelete: (quiz: Quiz) => void;
+  onStatusChange: (quizId: string, newStatus: "active" | "inactive") => void;
   page: number;
   onPageChange: (page: number) => void;
 }
@@ -33,6 +34,7 @@ const headCells: HeadCell[] = [
   { id: "stt", label: "STT" },
   { id: "lessonName", label: "Tên bài học" },
   { id: "quizName", label: "Tên bài quiz" },
+  { id: "courseName", label: "Tên khóa học" },
   { id: "status", label: "Trạng thái" },
 ];
 
@@ -48,6 +50,7 @@ const Table: React.FC<TableProps> = ({
   quizzes,
   onViewDetails,
   onDelete,
+  onStatusChange,
   page,
   onPageChange,
 }) => {
@@ -75,6 +78,11 @@ const Table: React.FC<TableProps> = ({
     onDelete(quiz);
   };
 
+  const handleStatusClick = (quiz: Quiz) => {
+    const newStatus = quiz.status === "active" ? "inactive" : "active";
+    onStatusChange(quiz.id, newStatus);
+  };
+
   // Calculate the current page's data
   const paginatedQuizzes = quizzes.slice(
     page * rowsPerPage,
@@ -100,11 +108,14 @@ const Table: React.FC<TableProps> = ({
               <TableCell>{page * rowsPerPage + index + 1}</TableCell>
               <TableCell>{item.lessonName}</TableCell>
               <TableCell sx={{ fontWeight: 500 }}>{item.quizName}</TableCell>
+              <TableCell>{item.courseName}</TableCell>
               <TableCell>
                 <Chip
                   label={getStatusDisplay(item.status).label}
                   color={getStatusDisplay(item.status).color}
                   size="small"
+                  onClick={() => handleStatusClick(item)}
+                  sx={{ cursor: "pointer" }}
                 />
               </TableCell>
               <TableCell>

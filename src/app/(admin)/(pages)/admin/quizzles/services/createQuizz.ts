@@ -97,26 +97,36 @@ class QuizManager {
 
   /**
    * Transform quiz cards to backend format
-   * Structure: { lessonId, question, answers, trueAnswer }
+   * Structure: { title, lessonId, timeLimit, questions: [{ questionName, answers, trueAnswer }] }
    */
-  prepareDataForBackend(lessonId: string): Array<{
+  prepareDataForBackend(lessonId: string, title: string, timeLimit: number): {
+    title: string;
     lessonId: number;
-    question: string;
-    answers: string[];
-    trueAnswer: number;
-  }> {
-    return this.quizCards.map((card) => {
+    timeLimit: number;
+    questions: Array<{
+      questionName: string;
+      answers: string[];
+      trueAnswer: number;
+    }>;
+  } {
+    const questions = this.quizCards.map((card) => {
       const correctAnswerIndex = card.options.findIndex(
         (opt) => opt.id === card.correctOption
       );
 
       return {
-        lessonId: parseInt(lessonId),
-        question: card.question,
+        questionName: card.question,
         answers: card.options.map((opt) => opt.text),
         trueAnswer: correctAnswerIndex >= 0 ? correctAnswerIndex : 0,
       };
     });
+
+    return {
+      title: title,
+      lessonId: parseInt(lessonId),
+      timeLimit: timeLimit,
+      questions: questions,
+    };
   }
 }
 

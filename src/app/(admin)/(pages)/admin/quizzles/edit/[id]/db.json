@@ -1,0 +1,53 @@
+{
+    "quiz_id": 9,
+    "questionsToCreate": [],
+    "questionsToUpdate": [
+      {
+        "question_id": 13,
+        "content": "HTML là gì",
+        "answers": [
+          {
+            "answer_id": 49,
+            "content": "HTML 1"
+          },
+          {
+            "answer_id": 50,
+            "content": "HTML 2"
+          },
+          {
+            "answer_id": 51,
+            "content": "HTML 3"
+          },
+          {
+            "answer_id": 52,
+            "content": "HTML 4"
+          }
+        ],
+        "true_answer": 0
+      },
+      {
+        "question_id": 14,
+        "content": "CSS là gì",
+        "answers": [
+          {
+            "answer_id": 53,
+            "content": "CSS 3"
+          },
+          {
+            "answer_id": 54,
+            "content": "CSS 2"
+          },
+          {
+            "answer_id": 55,
+            "content": "CSS 3"
+          },
+          {
+            "answer_id": 56,
+            "content": "CSS 4"
+          }
+        ],
+        "true_answer": 0
+      }
+    ],
+    "deletedQuestionIds": []
+  }

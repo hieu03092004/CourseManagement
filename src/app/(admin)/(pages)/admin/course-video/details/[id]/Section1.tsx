@@ -1,20 +1,16 @@
 "use client";
-import Link from "next/link";
 import { FaStarHalfAlt } from "react-icons/fa";
 import { FaComments, FaRegStar, FaStar, FaUserGraduate } from "react-icons/fa6";
 
 type Props = {
-    courseId: string;
     title: string;
     description: string;
     rating: number;
     reviewsCount: number;
-    totalLessons: number;
     totalStudents: number;
-    status: string;
 };
 
-export default function Section1({ courseId, title, description, rating, reviewsCount, totalLessons, totalStudents, status }: Props) {
+export default function Section1({ title, description, rating, reviewsCount, totalStudents }: Props) {
     return (
         <div className="bg-white shadow-md rounded-lg p-6">
             <div className="text-2xl font-bold text-gray-800 mb-4">
@@ -25,7 +21,7 @@ export default function Section1({ courseId, title, description, rating, reviews
             </div>
             <ul className="stats list-none flex gap-4 text-[13px] pt-4 border-t border-gray-200">
                 <li className="overall-rating flex gap-2 items-center justify-center ">
-                    <span className="">{rating}</span>
+                    <span className="">{rating.toFixed(1)}</span>
                     <span className=" flex gap-1 text-yellow-500">
                         {[1, 2, 3, 4, 5].map((i) =>
                             rating >= i ? (

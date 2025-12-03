@@ -1,7 +1,10 @@
-[
+{
+  "title": "Quiz cơ bản HTML",
+  "lessonId": 1,
+  "timeLimit": 120,
+  "questions": [
     {
-      "lessonId": 1,
-      "question": "HTML là viết tắt của...?",
+      "questionName": "HTML là viết tắt của...?",
       "answers": [
         "Hyperlinks and Text Markup Language",
         "Home Tool Markup Language",
@@ -11,7 +14,6 @@
       "trueAnswer": 2
     },
     {
-      "lessonId": 2,
       "question": "Ai là người đưa ra các tiêu chuẩn Web?",
       "answers": [
         "Tổ chức World Wide Web Consortium (W3C)",
@@ -21,4 +23,6 @@
       ],
       "trueAnswer": 0
     }
-]
+    
+  ]
+}
