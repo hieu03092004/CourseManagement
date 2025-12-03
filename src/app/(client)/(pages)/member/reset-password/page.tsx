@@ -1,7 +1,11 @@
 "use client"
 import { useState } from 'react';
 import React from 'react';
+import { useSearchParams, useRouter } from 'next/navigation';
 import ButtonInput from '@/app/(client)/components/Button/btn_input';
+import { post } from '@/app/(admin)/ultils/request';
+import { handleResponse } from '@/helpers/api/response/handleResponse';
+import { IApiResponse } from '@/helpers/api/response/IResponse';
 
 type SvgProps = React.ComponentProps<'svg'>;
 
@@ -11,22 +15,68 @@ const LockIcon = (props: SvgProps) => (
   </svg>
 );
 
-export default function ConfirmForgotPasswordPage() {
-  const [code, setCode] = useState(['', '', '', '', '']); 
+export default function ConfirmForgotPasswordPage() { 
+  const searchParams = useSearchParams();
+  const router = useRouter();
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
 
   const inputClass = "block w-full pl-10 pr-4 py-2.5 text-base border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out";
 
   const labelClass = "block text-base font-medium text-gray-700 after:content-['*'] after:ml-0.5 after:text-red-500";
-  
-  const handleCodeChange = (e: React.ChangeEvent<HTMLInputElement>, index: number) => {
-    const value = e.target.value;
-    const newCode = [...code];
 
-    newCode[index] = value.slice(-1); 
-    setCode(newCode);
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    // Lấy email và token từ query string
+    const email = searchParams.get('email');
+    const token = searchParams.get('token');
+
+    if (!email || !token) {
+      alert("Thiếu thông tin email hoặc token. Vui lòng kiểm tra lại link!");
+      return;
+    }
+
+    // Validate password
+    if (!newPassword || !confirmPassword) {
+      alert("Vui lòng nhập đầy đủ mật khẩu mới và xác nhận mật khẩu!");
+      return;
+    }
+
+    if (newPassword !== confirmPassword) {
+      alert("Mật khẩu mới và xác nhận mật khẩu không khớp!");
+      return;
+    }
+
+    const requestData = {
+      email: email,
+      token: token,
+      password: newPassword,
+      password_confirmation: confirmPassword
+    };
+
+    try {
+      const response = await post("/auth/reset-password", requestData) as IApiResponse<unknown>;
+      const { isSuccess, error } = handleResponse(response);
+
+      if (isSuccess) {
+        alert("Đổi mật khẩu thành công, vui lòng đăng nhập lại.");
+        router.push('/member/login');
+      } else {
+        // Kiểm tra nếu là lỗi INVALID_RESET_TOKEN
+        if (error?.code === 'INVALID_RESET_TOKEN') {
+          alert("Link đổi mật khẩu đã hết hạn hoặc không hợp lệ. Vui lòng yêu cầu lại forgot-password.");
+        } else {
+          const errorMessage = error?.message || "Có lỗi xảy ra khi đổi mật khẩu!";
+          alert(errorMessage);
+        }
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      alert("Có lỗi xảy ra khi đổi mật khẩu!");
+    }
   };
+
 
 
   return (
@@ -46,30 +96,10 @@ export default function ConfirmForgotPasswordPage() {
       <div className="w-full max-w-xl mt-3 p-5 md:p-7 bg-white shadow-xl rounded-xl border border-gray-100">
         <h2 className="text-4xl font-bold text-gray-800 mb-8 text-center">Quên mật khẩu</h2>
 
-        <p className="text-center text-gray-600 mb-6">
-          Vui lòng nhập mã xác nhận 5 chữ số đã được gửi tới email của bạn.
-        </p>
 
-        <form className="space-y-6">
+        <form className="space-y-6" onSubmit={handleSubmit}>
           
-          <div>
-            <label className={labelClass.replace("after:ml-0.5 after:text-red-500", "")}>
-              Mã xác nhận (5 chữ số)
-            </label>
-            <div className="mt-1 flex space-x-3 justify-between max-w-sm mx-auto">
-              {code.map((digit, index) => (
-                <input
-                  key={index}
-                  type="text"
-                  maxLength={1}
-                  value={digit}
-                  onChange={(e) => handleCodeChange(e, index)}
-                  className="w-12 h-12 text-center text-xl font-bold border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out"
-                  style={{ caretColor: '#00ff99' }}
-                />
-              ))}
-            </div>
-          </div>
+        
           
           <div className="pt-2">
             <label htmlFor="newPassword" className={labelClass}>
