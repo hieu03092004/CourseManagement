@@ -1,7 +1,10 @@
 "use client"
 import React from 'react';
 import Link from 'next/link';
-import ButtonInput from '@/app/(client)/components/Button/btn_input'; 
+import ButtonInput from '@/app/(client)/components/Button/btn_input';
+import { post } from '@/app/(admin)/ultils/request';
+import { handleResponse } from '@/helpers/api/response/handleResponse';
+import { IApiResponse } from '@/helpers/api/response/IResponse'; 
 
 type SvgProps = React.ComponentProps<'svg'>;
 
@@ -22,7 +25,36 @@ export default function ForgotPasswordPage() {
 
   const labelClass = "block text-base font-medium text-gray-700 after:content-['*'] after:ml-0.5 after:text-red-500";
   
-  const selectedClass = 'border-blue-500 bg-blue-50 shadow-md'; 
+  const selectedClass = 'border-blue-500 bg-blue-50 shadow-md';
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const email = (e.target as HTMLFormElement).recoveryInput.value;
+
+    if (!email) {
+      alert("Vui lòng nhập email!");
+      return;
+    }
+
+    const requestData = {
+      email: email
+    };
+
+    try {
+      const response = await post("/auth/forgot-password", requestData) as IApiResponse<unknown>;
+      const { isSuccess, error } = handleResponse(response);
+
+      if (isSuccess) {
+        alert("Đã gửi email khôi phục mật khẩu. Vui lòng kiểm tra hộp thư của bạn!");
+      } else {
+        const errorMessage = error?.message || "Có lỗi xảy ra khi gửi email khôi phục mật khẩu!";
+        alert(errorMessage);
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      alert("Có lỗi xảy ra khi gửi email khôi phục mật khẩu!");
+    }
+  }; 
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col items-center pt-4 md:pt-8">
@@ -41,7 +73,7 @@ export default function ForgotPasswordPage() {
       <div className="w-full max-w-xl mt-3 p-5 md:p-7 bg-white shadow-xl rounded-xl border border-gray-100">
         <h2 className="text-4xl font-bold text-gray-800 mb-8 text-center">Quên mật khẩu</h2>
 
-        <form className="space-y-6">
+        <form className="space-y-6" onSubmit={handleSubmit}>
 
           <div className="space-y-4">
             {/* Chỉ hiển thị tùy chọn Email */}
