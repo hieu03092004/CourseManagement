@@ -5,7 +5,7 @@ import { useEffect } from "react";
 import { FaCartShopping, FaRegUser } from "react-icons/fa6";
 import { useDispatch, useSelector } from "react-redux";
 import { checkLogin } from "../../actions";
-import { deleteCookie, getCookie } from "../../helpers/cookie";
+import {  getCookie } from "../../helpers/cookie";
 import { IMenuAuth } from "../../interfaces/IMenuAuth";
 import { usePathname } from "next/navigation";
 import { IMenuLink } from "../../interfaces/IMenuLink";
