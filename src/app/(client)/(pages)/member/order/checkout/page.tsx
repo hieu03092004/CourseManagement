@@ -1,9 +1,10 @@
 "use client";
 import { zaloPayService } from "@/lib/services/zalopay.service";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { FaArrowLeft } from "react-icons/fa";
+import { useSelector } from "react-redux";
+import { getCookie } from "../../../../helpers/cookie";
 
 // interface PaymentMethod {
 //   id: string;
@@ -33,11 +34,15 @@ interface Course {
   documents?: number;
 }
 
+interface RootState {
+  loginReducer: boolean;
+}
+
 export default function OrderCheckoutPage() {
-  const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [courses, setCourses] = useState<Course[]>([]);
+  const isLogin = useSelector((state: RootState) => state.loginReducer);
 
   const [customerInfo, setCustomerInfo] = useState({
     id: "1",
@@ -73,6 +78,23 @@ export default function OrderCheckoutPage() {
     }
   }, []);
 
+  useEffect(() => {
+    // Load thông tin khách hàng từ cookie nếu đã đăng nhập
+    if (isLogin) {
+      const userId = getCookie("id");
+      const fullName = getCookie("fullName");
+      const email = getCookie("email");
+      const phone = getCookie("phone") || "0123456789";
+
+      setCustomerInfo({
+        id: userId || "1",
+        name: fullName || "",
+        email: email || "",
+        phone: phone,
+      });
+    }
+  }, [isLogin]);
+
   const totalAmount = courses.reduce((sum, course) => sum + course.price, 0);
   const totalOriginalPrice = courses.reduce(
     (sum, course) => sum + (course.originalPrice || course.price),
@@ -96,13 +118,17 @@ export default function OrderCheckoutPage() {
     try {
       // Chỉ gửi user_id, total_amount và mảng course_ids
       const courseIds = courses.map((c) => c.id);
+      const cartId = getCookie("cartId") || "";
 
       const result = await zaloPayService.createOrder({
         user_id: customerInfo.id,
         total_amount: totalAmount,
         course_ids: courseIds,
         bank_code: paymentMethods.bankCode || "",
+        cart_id: cartId,
       });
+
+      console.log("result create order:", result);
 
       if (result.success && result.order_url) {
         // Đánh dấu là đang chuyển đến trang thanh toán
