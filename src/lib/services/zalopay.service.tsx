@@ -1,9 +1,10 @@
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_DOMAIN;;
 export interface CreateOrderRequest {
   user_id: string;
   total_amount: number;
   course_ids: string[]; // Mảng course IDs
   bank_code?: string;
+  cart_id?: string;
 }
 
 export interface CreateOrderResponse {
@@ -94,32 +95,6 @@ class ZaloPayService {
     }
   }
 
-  /**
-   * Query order status
-   */
-  // async queryOrder(appTransId: string): Promise<QueryOrderResponse> {
-  //   try {
-  //     const response = await fetch(
-  //       `${API_BASE_URL}/api/payments/zalopay/query?app_trans_id=${appTransId}`,
-  //       {
-  //         method: "GET",
-  //         headers: {
-  //           Accept: "application/json",
-  //         },
-  //       }
-  //     );
-
-  //     const result = await response.json();
-  //     return result;
-  //   } catch (error) {
-  //     console.error("Query order error:", error);
-  //     return {
-  //       return_code: -1,
-  //       return_message:
-  //         error instanceof Error ? error.message : "Failed to query order",
-  //     };
-  //   }
-  // }
 
   /**
    * Format currency VND
