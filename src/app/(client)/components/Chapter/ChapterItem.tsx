@@ -2,22 +2,10 @@
 import { useState } from "react";
 import { IoMdArrowDropdownCircle } from "react-icons/io";
 import LessonList from "../Lesson/LessonList";
-
-interface Lesson {
-  title: string;
-  videoUrl: string;
-  duration: number;
-  orderIndex: number;
-}
-
-interface Topic {
-  title: string;
-  orderIndex: number;
-  lessons: Lesson[];
-}
+import { ITopic } from "@/app/(client)/interfaces/Course/ICourseDetail";
 
 type Props = {
-  topic: Topic;
+  topic: ITopic;
 };
 
 function ChapterItem({ topic }: Props) {
@@ -33,6 +21,7 @@ function ChapterItem({ topic }: Props) {
         <div className="chapter-title bg-sky-500/100 p-[5px] text-[14px] flex justify-between text-white font-medium">
           <span>{topic.title.toUpperCase()}</span>
           <div className="flex items-center gap-4">
+            <span className="me-[10px]">Quizz</span>
             <span className="me-[10px]">Timeline</span>
             <button
               type="button"
@@ -46,6 +35,7 @@ function ChapterItem({ topic }: Props) {
               />
             </button>
           </div>
+         
         </div>
 
         <LessonList isCollapsed={collapsed} lessons={topic.lessons} />

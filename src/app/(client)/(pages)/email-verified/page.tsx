@@ -1,7 +1,8 @@
 'use client';
 
 import { useEffect } from 'react';
-import { useSearchParams, useRouter } from 'next/navigation';;
+import { useSearchParams, useRouter } from 'next/navigation';
+import { setCookie } from '@/app/(client)/helpers/cookie';
 
 export default function EmailVerifiedPage() {
   const searchParams = useSearchParams();
@@ -26,6 +27,16 @@ export default function EmailVerifiedPage() {
       });
 
       if (res.ok) {
+        const response = await res.json();
+        
+        // cartId nằm trong response.data.cartId
+        const cartId = response.data?.cartId;
+        
+        // Lưu cartId vào cookie nếu có trong response
+        if (cartId) {
+          setCookie("cartId", String(cartId), 1);
+        }
+        
         // Redirect sau khi auto login
         router.push('/member/login');
       } else {

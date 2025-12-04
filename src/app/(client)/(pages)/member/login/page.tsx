@@ -53,7 +53,9 @@ export default function LoginPage() {
           id: number;
           email: string;
           fullName: string;
+          phone: string;
         };
+        cartId?: number;
       }>;
       
       const { isSuccess, data, error } = handleResponse(response);
@@ -65,7 +67,13 @@ export default function LoginPage() {
         setCookie("id", String(data.user.id), 1);
         setCookie("fullName", data.user.fullName, 1);
         setCookie("email", data.user.email, 1);
+        setCookie("phone", data.user.phone || "", 1);
         setCookie("token", data.token, 1);
+        
+        // Lưu cartId vào cookie nếu có trong response
+        if (data.cartId) {
+          setCookie("cartId", String(data.cartId), 1);
+        }
         
         // // Dispatch action login
         dispatch(checkLogin(true));

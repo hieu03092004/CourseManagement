@@ -1,5 +1,5 @@
 import LessonItem from "./LessonItem";
-import { ILesson } from "@/app/(client)/interfaces/ILesson";
+import { ILesson } from "@/app/(client)/interfaces/Lesson/ILesson";
 
 type Props = {
   isCollapsed: boolean;

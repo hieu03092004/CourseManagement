@@ -1,17 +1,12 @@
 "use client";
 import { useState } from "react";
 import { FaCirclePlay } from "react-icons/fa6";
+import { ILesson } from "@/app/(client)/interfaces/Lesson/ILesson";
+import Link from "next/link";
 import DiagLogVideo from "@/app/(client)/components/Modal/DiagLogVideo";
 
-interface Lesson {
-  title: string;
-  videoUrl: string;
-  duration: number;
-  orderIndex: number;
-}
-
 type Props = {
-  lesson: Lesson;
+  lesson: ILesson;
 };
 
 function formatDuration(seconds: number): string {
@@ -32,6 +27,14 @@ function LessonItem({ lesson }: Props) {
         </div>
         <div className="flex gap-4">
           <div className="lesson-item-watch">
+            <Link
+              href={`/quiz/${lesson.id}`}
+              className="underline decoration-sky-500 text-sky-500/100"
+            >
+              Làm bài
+            </Link>
+          </div>
+          <div className="lesson-item-watch">
             <button
               className="underline decoration-sky-500 text-sky-500/100"
               onClick={() => setModalOpen(true)}
@@ -39,6 +42,7 @@ function LessonItem({ lesson }: Props) {
               Vào học
             </button>
           </div>
+         
           <div className="lesson-item-duration">{formatDuration(lesson.duration)}</div>
         </div>
       </li>

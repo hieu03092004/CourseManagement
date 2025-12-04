@@ -17,6 +17,8 @@ export default function Section2({
   reviewsCount,
   studentCount,
 }: props) {
+  const roundedRating = parseFloat(rating.toFixed(1));
+
   return (
     <>
       <div className="herro-banner bg-primary h-auto text-white flex items-center justify-start pb-8">
@@ -25,12 +27,12 @@ export default function Section2({
           <div className="herro-desc text-[13px] pt-4">{description}</div>
           <ul className="stats list-none flex gap-4 mt-8 text-[13px] ">
             <li className="overall-rating flex gap-2 items-center justify-center ">
-              <span className="">{rating}</span>
+              <span className="">{roundedRating}</span>
               <span className=" flex gap-1 text-yellow-500">
                 {[1, 2, 3, 4, 5].map((i) =>
-                  rating >= i ? (
+                  roundedRating >= i ? (
                     <FaStar className="" key={i} />
-                  ) : rating >= i - 0.5 ? (
+                  ) : roundedRating >= i - 0.5 ? (
                     <FaStarHalfAlt key={i} />
                   ) : (
                     <FaRegStar key={i} />

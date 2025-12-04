@@ -12,7 +12,7 @@ import {
   ListItemIcon,
   ListItemText,
 } from "@mui/material";
-import { FaStar, FaBook, FaUser } from "react-icons/fa6";
+import { FaStar, FaBook, FaUser, FaClock } from "react-icons/fa6";
 import { FaEllipsisV, FaEye, FaEdit, FaPlus, FaTrash } from "react-icons/fa";
 import { Course } from "../../../interfaces/CourseVideo/ICourseVideo";
 import Link from "next/link";
@@ -118,6 +118,15 @@ const CardItem: React.FC<CardItemProps> = ({ course, onCourseDeleted }) => {
             </Typography>
             <Typography variant="body2" sx={{ fontSize: "13px", color: "var(--color-body)" }}>
               Học viên
+            </Typography>
+          </Stack>
+          <Stack direction="row" alignItems="center" sx={{ mb: 1.25 }}>
+            <FaClock style={{ fontSize: "13px", color: "var(--color-secondary)", marginRight: "5px" }} />
+            <Typography variant="body2" sx={{ fontSize: "13px", fontWeight: 700, mr: 0.5, color: "var(--color-body)" }}>
+              {course.duration}
+            </Typography>
+            <Typography variant="body2" sx={{ fontSize: "13px", color: "var(--color-body)" }}>
+              ngày
             </Typography>
           </Stack>
         </Box>

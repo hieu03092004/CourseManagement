@@ -1,7 +1,7 @@
 "use client";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { FaCartPlus } from "react-icons/fa";
 import { FaPlay } from "react-icons/fa6";
 import {
@@ -11,98 +11,69 @@ import {
   LiaInfinitySolid,
   LiaNewspaperSolid,
 } from "react-icons/lia";
-import { ICourseDataRegister } from "@/app/(client)/interfaces/ICourseDataRegister";
+import { ICourseDetail } from "@/app/(client)/interfaces/Course/ICourseDetail";
 import DiagLogVideo from "@/app/(client)/components/Modal/DiagLogVideo";
 
-const fetchCourseData = async (courseID: string): Promise<ICourseDataRegister> => {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve({
-        id: courseID,
-    name: "Lập Trình Python Từ Cơ Bản Tới Nâng Cao",
-    price: 1200000,
-    originalPrice: 2750000,
-    lessons: 120,
-        duration: 56,
-    exercises: 300,
-    documents: 23,
-      });
-    }, 100);
-  });
-};
-
 type props = {
-  userID: string;
   courseID: string;
+  courseData: ICourseDetail;
   previewVideoUrl?: string;
+  userId: string;
 };
-
-export default function CourseSideScroll({ userID, courseID, previewVideoUrl }: props) {
+export default function CourseSideScroll({ courseID, courseData, previewVideoUrl, userId }: props) {
   const router = useRouter();
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [courseData, setCourseData] = useState<ICourseDataRegister | null>(null);
 
-  useEffect(() => {
-    const loadCourseData = async () => {
-      const data = await fetchCourseData(courseID);
-      setCourseData(data);
-    };
-    loadCourseData();
-  }, [courseID]);
-
+  // Tính toán các giá trị từ courseData
+  const totalLessons = courseData.topics.reduce((sum, topic) => sum + topic.lessons.length, 0);
+  const originalPrice = courseData.price *(1 - courseData.discountPercent / 100);
   const handleEnroll = () => {
-    // Lưu thông tin khóa học vào localStorage để sử dụng ở trang checkout
-    localStorage.setItem("checkoutCourse", JSON.stringify(courseData));
+    const checkoutData = {
+      id: courseID,
+      name: courseData.title,
+      price: courseData.price,
+      originalPrice: originalPrice,
+      image: courseData.image,
+      lessons: totalLessons,
+      duration: courseData.duration,
+      exercises: 0,
+      documents: 0,
+    };
+    localStorage.setItem("checkoutCourse", JSON.stringify(checkoutData));
     router.push("/member/order/checkout");
   };
+
   const handleAddCart = () => {
     alert("Thêm vào giỏ hàng thành công");
-    console.log(userID);
+    console.log(userId);
     console.log(courseID);
   };
 
   const handlePlayPreview = () => {
-    if (previewVideoUrl) {
-      setIsModalOpen(true);
-    }
+    setIsModalOpen(true);
   };
 
   const handleCloseModal = () => {
     setIsModalOpen(false);
   };
 
-  if (!courseData) {
-    return (
-      <div className="bg-white rounded-xl border border-[#f1f3f5] overflow-hidden p-4">
-        <div className="animate-pulse">
-          <div className="bg-gray-200 h-40 w-full rounded"></div>
-          <div className="p-6 space-y-4">
-            <div className="h-6 bg-gray-200 rounded w-3/4"></div>
-            <div className="h-10 bg-gray-200 rounded"></div>
-            <div className="h-10 bg-gray-200 rounded"></div>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="bg-white rounded-xl border border-[#f1f3f5] overflow-hidden p-4">
       {/* Video thumbnail */}
       <div className="relative">
         <Image
-          src="/src/assets/images/course_default.jpg"
+          src={courseData.image || "/src/assets/images/course_default.jpg"}
           alt="Course thumbnail"
           width={400}
           height={160}
-          className=" w-full h-45 object-cover"
+          className="w-full h-45 object-cover"
         />
         <button
           onClick={handlePlayPreview}
           className="absolute inset-0 flex items-center justify-center cursor-pointer"
         >
           <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center">
-            <FaPlay  />
+            <FaPlay />
           </div>
         </button>
       </div>
@@ -111,16 +82,16 @@ export default function CourseSideScroll({ userID, courseID, previewVideoUrl }: 
       <div className="p-6">
         <div className="flex items-center gap-3 mb-4">
           <span className="text-xl font-bold text-gray-900">
-            {courseData.price.toLocaleString('vi-VN')}VND
+          {Math.round(originalPrice).toLocaleString('vi-VN')}VND
           </span>
           <span className="text-sm text-gray-400 line-through">
-            {courseData.originalPrice.toLocaleString('vi-VN')}VND
+            {courseData.price.toLocaleString('vi-VN')}VND
           </span>
         </div>
 
         <button
           onClick={handleAddCart}
-          className="w-full bg-white text-primary border border-primary hover:bg-primary hover:text-white font-semibold py-3 rounded-lg transition-colors mb-2 flex items-center justify-center gap-1"
+          className="w-full bg-white text-primary border border-primary hover:bg-primary hover:text-white font-semibold py-3 rounded-lg transition-colors mb-2 flex items-center justify-center gap-1 cursor-pointer"
         >
           <span>
             <FaCartPlus />
@@ -129,7 +100,7 @@ export default function CourseSideScroll({ userID, courseID, previewVideoUrl }: 
         </button>
         <button
           onClick={handleEnroll}
-          className="w-full bg-primary text-white font-semibold py-3 rounded-lg transition-colors mb-6 hover:bg-white hover:text-primary outline-1 hover:outline-primary"
+          className="w-full bg-primary text-white font-semibold py-3 rounded-lg transition-colors mb-6 hover:bg-white hover:text-primary outline-1 hover:outline-primary cursor-pointer"
         >
           Đăng Ký Học
         </button>
@@ -141,7 +112,7 @@ export default function CourseSideScroll({ userID, courseID, previewVideoUrl }: 
               <LiaBookSolid className="text-xl" />
               <span>Bài giảng</span>
             </div>
-            <span className="font-semibold text-gray-900">{courseData.lessons}</span>
+            <span className="font-semibold text-gray-900">{totalLessons}</span>
           </div>
 
           <div className="flex items-center justify-between text-sm">
@@ -149,7 +120,7 @@ export default function CourseSideScroll({ userID, courseID, previewVideoUrl }: 
               <LiaClockSolid className="text-xl" />
               <span>Thời lượng</span>
             </div>
-            <span className="font-semibold text-gray-900">{courseData.duration} giờ</span>
+            <span className="font-semibold text-gray-900">{courseData.duration} ngày</span>
           </div>
 
           <div className="flex items-center justify-between text-sm">
@@ -157,7 +128,7 @@ export default function CourseSideScroll({ userID, courseID, previewVideoUrl }: 
               <LiaNewspaperSolid className="text-xl" />
               <span>Bài tập</span>
             </div>
-            <span className="font-semibold text-gray-900">{courseData.exercises}</span>
+            <span className="font-semibold text-gray-900">0</span>
           </div>
 
           <div className="flex items-center justify-between text-sm">
@@ -165,7 +136,7 @@ export default function CourseSideScroll({ userID, courseID, previewVideoUrl }: 
               <LiaFileSolid className="text-xl" />
               <span>Tài liệu</span>
             </div>
-            <span className="font-semibold text-gray-900">{courseData.documents}</span>
+            <span className="font-semibold text-gray-900">0</span>
           </div>
 
           <div className="flex items-center justify-between text-sm">
@@ -182,7 +153,7 @@ export default function CourseSideScroll({ userID, courseID, previewVideoUrl }: 
         isOpen={isModalOpen}
         onClose={handleCloseModal}
         videoUrl={previewVideoUrl}
-        title={courseData.name}
+        title={courseData.title}
       />
     </div>
   );

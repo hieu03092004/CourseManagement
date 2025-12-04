@@ -158,6 +158,7 @@ function FormInner() {
 
 export default function Section3({ rating, reviews }: props) {
   const [formOpen, setFormOpen] = useState(false);
+  const roundedRating = parseFloat(rating.toFixed(1));
 
   const ratingBreakdown = useMemo(() => {
     const total = reviews.length;
@@ -195,12 +196,12 @@ export default function Section3({ rating, reviews }: props) {
         </h1>
         <div className="rating-overall flex justify-center items-center text-center bg-gray-100 rounded-lg h-full py-4 w-full ">
           <div className="w-1/4 flex-col justify-center items-center text-yellow-400 ">
-            <span className="font-bold text-[36px] ">{rating}</span>
+            <span className="font-bold text-[36px] ">{roundedRating}</span>
             <span className=" flex gap-1 justify-center items-center text-[25px] ">
               {[1, 2, 3, 4, 5].map((i) =>
-                rating >= i ? (
+                roundedRating >= i ? (
                   <FaStar className="" key={i} />
-                ) : rating >= i - 0.5 ? (
+                ) : roundedRating >= i - 0.5 ? (
                   <FaStarHalfAlt key={i} />
                 ) : (
                   <FaRegStar key={i} />

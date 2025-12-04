@@ -1,84 +1,150 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import Link from "next/link";
+import { ICartItem } from "@/app/(client)/interfaces/Cart/ICartItem";
+import { get } from "@/app/(admin)/ultils/request";
+import { handleResponse } from "@/helpers/api/response/handleResponse";
+import { IApiResponse } from "@/helpers/api/response/IResponse";
+import { getCookie } from "@/app/(client)/helpers/cookie";
 
-interface Course {
-  id: string;
-  title: string;
-  price: number;
-  image: string;
+interface CartData {
+  items: ICartItem[];
 }
 
-const fetchCartData = (): Course[] => {
-  return [
-    {
-      id: "1",
-      title:
-        "Lập Trình Python Từ Cơ Bản Tới Nâng Cao Qua 120 Video Và 300 Bài Tập Thực Hành (Update 2025)",
-      price: 1200000,
-      image: "/src/assets/images/course_img_demo.png",
-    },
-    {
-      id: "2",
-      title:
-        "Lập Trình Python Từ Cơ Bản Tới Nâng Cao Qua 120 Video Và 300 Bài Tập Thực Hành (Update 2025)",
-      price: 1200000,
-      image: "/src/assets/images/course_img_demo.png",
-    },
-    {
-      id: "3",
-      title:
-        "Lập Trình Python Từ Cơ Bản Tới Nâng Cao Qua 120 Video Và 300 Bài Tập Thực Hành (Update 2025)",
-      price: 1200000,
-      image: "/src/assets/images/course_img_demo.png",
-    },
-    {
-      id: "4",
-      title:
-        "Lập Trình Python Từ Cơ Bản Tới Nâng Cao Qua 120 Video Và 300 Bài Tập Thực Hành (Update 2025)",
-      price: 1200000,
-      image: "/src/assets/images/course_img_demo.png",
-    },
-  ];
-};
 export default function CartPage() {
-  localStorage.removeItem("checkoutCourses");
-  localStorage.removeItem("checkoutCourse");
-
-  const cartData = fetchCartData();
+  const [cartData, setCartData] = useState<ICartItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [selectedCourses, setSelectedCourses] = useState<string[]>([]);
 
-  const toggleCourse = (courseId: string) => {
+  useEffect(() => {
+    // Xóa dữ liệu checkout cũ khi component mount (chỉ chạy trên client-side)
+    if (typeof window !== "undefined") {
+      localStorage.removeItem("checkoutCourses");
+      localStorage.removeItem("checkoutCourse");
+    }
+
+    const fetchCartData = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+
+        // Lấy cartId từ cookie
+        const cartId = getCookie("cartId");
+        if (!cartId) {
+          setError("Không tìm thấy giỏ hàng. Vui lòng đăng nhập.");
+          setLoading(false);
+          return;
+        }
+
+        // Call API để lấy dữ liệu giỏ hàng
+        const response = await get(`/client/cart/${cartId}`) as IApiResponse<CartData>;
+        const { isSuccess, data, error: responseError } = handleResponse(response);
+
+        if (isSuccess && data?.items) {
+          setCartData(data.items);
+        } else {
+          const errorMessage = responseError?.message || "Không thể tải dữ liệu giỏ hàng";
+          setError(errorMessage);
+          console.error("Error fetching cart:", responseError);
+        }
+      } catch (err) {
+        const errorMessage = err instanceof Error ? err.message : "Có lỗi xảy ra khi tải giỏ hàng";
+        setError(errorMessage);
+        console.error("Error:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCartData();
+  }, []);
+
+  const toggleCourse = (index: string) => {
     setSelectedCourses((prev) =>
-      prev.includes(courseId)
-        ? prev.filter((id) => id !== courseId)
-        : [...prev, courseId]
+      prev.includes(index)
+        ? prev.filter((id) => id !== index)
+        : [...prev, index]
     );
   };
 
+  // Tính tổng tiền dựa trên originalPrice (giá sau khi giảm)
   const total = cartData
-    .filter((c) => selectedCourses.includes(c.id))
-    .reduce((s, c) => s + c.price, 0);
+    .filter((_, index) => selectedCourses.includes(String(index)))
+    .reduce((s, c) => s + c.originalPrice, 0);
 
   const handleCheckout = () => {
-    const selectedItems = cartData.filter((c) =>
-      selectedCourses.includes(c.id)
-    );
-    if (selectedItems.length === 0) {
+    const selectedIndices = cartData
+      .map((_, index) => index)
+      .filter((index) => selectedCourses.includes(String(index)));
+    
+    if (selectedIndices.length === 0) {
       alert("Vui lòng chọn ít nhất một khóa học");
       return;
     }
+
+    // Map dữ liệu từ cart sang format mà checkout page mong đợi
+    // Từ BE: price = giá gốc, originalPrice = giá sau khi giảm
+    // Checkout page mong đợi: price = giá gốc, originalPrice = giá sau khi giảm
+    const selectedItems = selectedIndices.map((index) => ({
+      id: String(index + 1), // Tạm thời dùng index làm id
+      title: cartData[index].title,
+      price: cartData[index].price, // Giá gốc từ BE
+      originalPrice: cartData[index].originalPrice, // Giá sau khi giảm từ BE
+      image: cartData[index].image,
+      lessons: 0, // Không có trong API response, để mặc định
+      duration: 0, // Không có trong API response, để mặc định
+      exercises: 0, // Không có trong API response, để mặc định
+      documents: 0, // Không có trong API response, để mặc định
+    }));
+
     localStorage.setItem("checkoutCourses", JSON.stringify(selectedItems));
     window.location.href = "/member/order/checkout";
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 py-8 flex items-center justify-center">
+        <p className="text-gray-600">Đang tải giỏ hàng...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-50 py-8 flex items-center justify-center">
+        <p className="text-red-600">Lỗi: {error}</p>
+      </div>
+    );
+  }
+
+  if (cartData.length === 0) {
+    return (
+      <div className="min-h-screen bg-gray-50 py-8">
+        <div className="container mx-auto px-4 max-w-7xl">
+          <div className="flex items-center gap-2 text-sm mb-6">
+            <Link href="/" className="text-gray-600 hover:text-blue-600">
+              Trang chủ
+            </Link>
+            <span className="text-gray-400">•</span>
+            <span className="text-blue-600 font-medium">Đơn hàng</span>
+          </div>
+          <div className="text-center py-16">
+            <p className="text-gray-600 text-lg">Giỏ hàng của bạn đang trống</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="container mx-auto px-4 max-w-7xl">
         {/* Breadcrumb */}
         <div className="flex items-center gap-2 text-sm mb-6">
-          <a href="/" className="text-gray-600 hover:text-blue-600">
+          <Link href="/" className="text-gray-600 hover:text-blue-600">
             Trang chủ
-          </a>
+          </Link>
           <span className="text-gray-400">•</span>
           <span className="text-blue-600 font-medium">Đơn hàng</span>
         </div>
@@ -106,15 +172,15 @@ export default function CartPage() {
 
               {/* Course list */}
               <div className="space-y-4">
-                {cartData.map((course) => (
+                {cartData.map((course, index) => (
                   <div
-                    key={course.id}
+                    key={index}
                     className="flex items-center gap-4 bg-white p-4 rounded-lg"
                   >
                     <input
                       type="checkbox"
-                      checked={selectedCourses.includes(course.id)}
-                      onChange={() => toggleCourse(course.id)}
+                      checked={selectedCourses.includes(String(index))}
+                      onChange={() => toggleCourse(String(index))}
                       className="w-5 h-5 text-blue-600 rounded focus:ring-2 focus:ring-blue-500 cursor-pointer flex-shrink-0"
                     />
 
@@ -134,8 +200,13 @@ export default function CartPage() {
 
                     <div className="text-right flex-shrink-0 w-32">
                       <div className="text-lg font-semibold text-gray-800">
-                        {course.price.toLocaleString("vi-VN")}
+                        {course.originalPrice.toLocaleString("vi-VN")}
                       </div>
+                      {course.originalPrice < course.price && (
+                        <div className="text-sm text-gray-400 line-through">
+                          {course.price.toLocaleString("vi-VN")} VND
+                        </div>
+                      )}
                       <div className="text-sm text-gray-500">VND</div>
                     </div>
 

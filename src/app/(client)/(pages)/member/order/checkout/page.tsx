@@ -6,13 +6,6 @@ import { FaArrowLeft } from "react-icons/fa";
 import { useSelector } from "react-redux";
 import { getCookie } from "../../../../helpers/cookie";
 
-// interface PaymentMethod {
-//   id: string;
-//   name: string;
-//   description: string;
-//   icon: string;
-//   bankCode?: string;
-// }
 
 const paymentMethods = {
   id: "atm",
@@ -55,7 +48,6 @@ export default function OrderCheckoutPage() {
     // Load courses từ localStorage (từ cart hoặc từ course detail)
     const savedCourses = localStorage.getItem("checkoutCourses");
     const savedCourse = localStorage.getItem("checkoutCourse");
-
     if (savedCourses) {
       // Từ cart - nhiều khóa học
       const coursesData = JSON.parse(savedCourses);
@@ -69,6 +61,7 @@ export default function OrderCheckoutPage() {
           title: courseData.name,
           price: courseData.price,
           originalPrice: courseData.originalPrice,
+          image: courseData.image,
           lessons: courseData.lessons,
           duration: courseData.duration,
           exercises: courseData.exercises,
@@ -95,11 +88,19 @@ export default function OrderCheckoutPage() {
     }
   }, [isLogin]);
 
+  // Tính tổng giá sau giảm (price) và tổng giá gốc (originalPrice)
+  console.log("courses", courses);
   const totalAmount = courses.reduce((sum, course) => sum + course.price, 0);
   const totalOriginalPrice = courses.reduce(
     (sum, course) => sum + (course.originalPrice || course.price),
     0
   );
+  console.log("totalAmount", totalAmount);
+  console.log("totalOriginalPrice", totalOriginalPrice);
+
+  // Với 1 item: tạm tính và tổng cộng = originalPrice
+  // Với nhiều items: tạm tính = totalOriginalPrice, tổng cộng = totalAmount
+
 
   const handlePayment = async () => {
     if (!customerInfo.name || !customerInfo.email || !customerInfo.phone) {
@@ -118,11 +119,12 @@ export default function OrderCheckoutPage() {
     try {
       // Chỉ gửi user_id, total_amount và mảng course_ids
       const courseIds = courses.map((c) => c.id);
+      console.log("courses", courses);
       const cartId = getCookie("cartId") || "";
 
       const result = await zaloPayService.createOrder({
         user_id: customerInfo.id,
-        total_amount: totalAmount,
+        total_amount: totalOriginalPrice,
         course_ids: courseIds,
         bank_code: paymentMethods.bankCode || "",
         cart_id: cartId,
@@ -197,12 +199,11 @@ export default function OrderCheckoutPage() {
                       </h3>
                       <div className="flex items-center gap-3">
                         <span className="text-lg font-bold text-blue-600">
-                          {course.price.toLocaleString("vi-VN")}₫
+                          {(course.originalPrice || course.price).toLocaleString("vi-VN")}₫
                         </span>
-                        {course.originalPrice &&
-                          course.originalPrice > course.price && (
+                        {course.originalPrice && course.originalPrice !== course.price && (
                             <span className="text-gray-400 line-through text-sm">
-                              {course.originalPrice.toLocaleString("vi-VN")}₫
+                              {course.price.toLocaleString("vi-VN")}₫
                             </span>
                           )}
                       </div>
@@ -219,12 +220,13 @@ export default function OrderCheckoutPage() {
                     {totalAmount.toLocaleString("vi-VN")}₫
                   </span>
                 </div>
-                {totalOriginalPrice > totalAmount && (
+                {/* Chỉ hiển thị giảm giá khi có nhiều items và totalOriginalPrice < totalAmount */}
+                { totalOriginalPrice < totalAmount && (
                   <div className="flex justify-between text-sm">
                     <span className="text-gray-600">Giảm giá</span>
                     <span className="text-green-600 font-semibold">
                       -
-                      {(totalOriginalPrice - totalAmount).toLocaleString(
+                      {(totalAmount - totalOriginalPrice).toLocaleString(
                         "vi-VN"
                       )}
                       ₫
@@ -234,7 +236,7 @@ export default function OrderCheckoutPage() {
                 <div className="border-t pt-3 flex justify-between">
                   <span className="font-semibold text-lg">Tổng cộng</span>
                   <span className="font-bold text-2xl text-blue-600">
-                    {totalAmount.toLocaleString("vi-VN")}₫
+                    {totalOriginalPrice.toLocaleString("vi-VN")}₫
                   </span>
                 </div>
               </div>

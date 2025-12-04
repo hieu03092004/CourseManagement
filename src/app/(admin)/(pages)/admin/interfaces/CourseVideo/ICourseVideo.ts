@@ -75,6 +75,7 @@ export interface Course {
   price: number;
   originalPrice: number;
   image: string;
+  duration: number;
 }
 
 export interface ICourseDetailsPageProps {
