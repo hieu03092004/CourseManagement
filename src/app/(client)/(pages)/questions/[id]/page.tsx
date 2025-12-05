@@ -1,5 +1,8 @@
 "use client";
 import { use, useState, useEffect, useRef } from "react";
+import { get } from "@/app/(admin)/ultils/request";
+import { handleResponse } from "@/helpers/api/response/handleResponse";
+import { IApiResponse } from "@/helpers/api/response/IResponse";
 
 interface PageProps {
   params: Promise<{
@@ -18,49 +21,6 @@ interface QuizData {
   questions: Question[];
 }
 
-const getQuizData = async (quizId: string): Promise<QuizData> => {
-  // TODO: Fetch from API
-  // const response = await fetch(`http://localhost:3002/quizzes/${quizId}`);
-  // const data = await response.json();
-  // return {
-  //   timeLimit: data.timeLimit, // TIME_LIMIT từ table QUIZZ
-  //   questions: data.questions
-  // };
-
-  // For now, using mock data
-  const mockData: QuizData = {
-    timeLimit: 120, // TIME_LIMIT từ database (giây)
-    questions: [
-      {
-        id: 1,
-        question: "HTML là viết tắt của...?",
-        answers: [
-          "Hyperlinks and Text Markup Language",
-          "Home Tool Markup Language",
-          "Hyper Text Markup Language",
-        ],
-      },
-      {
-        id: 2,
-        question: "Ai là người đưa ra các tiêu chuẩn Web?",
-        answers: [
-          "Tổ chức World Wide Web Consortium (W3C)",
-          "Apple",
-          "Google",
-          "Microsoft",
-        ],
-      },
-      {
-        id: 3,
-        question: "Thẻ nào dùng để nhúng video trong HTML5?",
-        answers: ["<video>", "<media>", "<movie>"],
-      },
-    ],
-  };
-
-  return mockData;
-};
-
 export default function QuestionsPage({ params }: PageProps) {
   const { id } = use(params);
   const [questions, setQuestions] = useState<Question[]>([]);
@@ -68,16 +28,40 @@ export default function QuestionsPage({ params }: PageProps) {
     [key: number]: number;
   }>({});
   const [timeLeft, setTimeLeft] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const submitButtonRef = useRef<HTMLButtonElement>(null);
 
   // Fetch quiz data on mount
   useEffect(() => {
     const fetchQuizData = async () => {
-      const data = await getQuizData(id);
-      setTimeLeft(data.timeLimit);
-      setQuestions(data.questions);
+      try {
+        setLoading(true);
+        setError(null);
+
+        const response = await get(`/client/question/detail/${id}`) as IApiResponse<QuizData>;
+        const { isSuccess, data, error: responseError } = handleResponse(response);
+
+        if (isSuccess && data) {
+          setTimeLeft(data.timeLimit);
+          setQuestions(data.questions);
+        } else {
+          const errorMessage = responseError?.message || "Không thể tải dữ liệu bài kiểm tra";
+          setError(errorMessage);
+          console.error("Error fetching quiz data:", responseError);
+        }
+      } catch (err) {
+        const errorMessage = err instanceof Error ? err.message : "Có lỗi xảy ra khi tải bài kiểm tra";
+        setError(errorMessage);
+        console.error("Error:", err);
+      } finally {
+        setLoading(false);
+      }
     };
-    fetchQuizData();
+
+    if (id) {
+      fetchQuizData();
+    }
   }, [id]);
 
   // Countdown timer
@@ -139,12 +123,38 @@ export default function QuestionsPage({ params }: PageProps) {
     alert("Đã nộp bài!");
   };
 
-  if (questions.length === 0) {
+  if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600 mx-auto mb-4"></div>
           <p className="text-gray-600">Đang tải bài kiểm tra...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-red-600 text-lg mb-4">Lỗi: {error}</p>
+          <button
+            onClick={() => window.location.reload()}
+            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+          >
+            Thử lại
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  if (questions.length === 0) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-gray-600 text-lg">Không có câu hỏi nào</p>
         </div>
       </div>
     );
