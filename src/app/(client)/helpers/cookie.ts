@@ -2,7 +2,8 @@ export function setCookie(cname:string,cvalue:string,exdays:number){
     const d=new Date();
     d.setTime(d.getTime()+exdays*24*60*60*1000);
     const expires="expires=" +d.toUTCString();
-    document.cookie=cname+"="+cvalue+";"+expires;
+    // Set cookie với path=/ để có thể truy cập từ mọi path
+    document.cookie=cname+"="+cvalue+";"+expires+";path=/";
 }
 export function getCookie(cname:string) {
     const name = cname + "=";
@@ -20,7 +21,12 @@ export function getCookie(cname:string) {
 }
 
 export function deleteCookie(cname:string) {
-    document.cookie = `${cname}=; expires=Thu, 01 Jan 1970 00:00:00 UTC`;
+    // Xóa cookie với path=/ để đảm bảo xóa được cookie ở mọi path
+    document.cookie = `${cname}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/`;
+    // Xóa cookie với domain hiện tại (nếu có)
+    document.cookie = `${cname}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=${window.location.hostname}`;
+    // Xóa cookie không có domain (localhost)
+    document.cookie = `${cname}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=localhost`;
 }
 
 export function deleteAllCookies() {
