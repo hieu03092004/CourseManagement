@@ -4,6 +4,7 @@ import Link from "next/link";
 import { get } from "@/app/(admin)/ultils/request";
 import { handleResponse } from "@/helpers/api/response/handleResponse";
 import { IApiResponse } from "@/helpers/api/response/IResponse";
+import { getCookie } from "@/app/(client)/helpers/cookie";
 
 interface PageProps {
   params: Promise<{
@@ -22,24 +23,21 @@ interface QuizAttempt {
   attemptDate: string;
 }
 
-const getQuizAttempts = (id: string): QuizAttempt[] => {
-  //   const response = await fetch(`http://localhost:3002/quiz-attempts?userId=1&courseId=${id}`);
-  //   const data = await response.json();
-  const dataAttempts = [
-    { id: 1, quizTitle: "HTML5", attemptDate: "2024-01-15" },
-    { id: 2, quizTitle: "CSS3", attemptDate: "2024-01-16" },
-    { id: 3, quizTitle: "Javascript", attemptDate: "2024-01-17" },
-  ];
-  return dataAttempts;
-};
+interface QuizAttemptResponse {
+  id: number;
+  quizTitle: string;
+  attemptDate: string;
+}
 
 export default function QuizPage({ params }: PageProps) {
   const { id } = use(params);
   const [activeTab, setActiveTab] = useState<"quizzes" | "attempts">("quizzes");
   const [quizzes, setQuizzes] = useState<Quiz[]>([]);
+  const [attempts, setAttempts] = useState<QuizAttempt[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadingAttempts, setLoadingAttempts] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const attempts = getQuizAttempts(id);
+  const [errorAttempts, setErrorAttempts] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchQuizzes = async () => {
@@ -47,7 +45,7 @@ export default function QuizPage({ params }: PageProps) {
         setLoading(true);
         setError(null);
 
-        const response = await get(`/client/getQuizz/detail/${id}`) as IApiResponse<Quiz[]>;
+        const response = await get(`/client/quizz/detail/${id}`) as IApiResponse<Quiz[]>;
         const { isSuccess, data, error: responseError } = handleResponse(response);
 
         if (isSuccess && data) {
@@ -70,6 +68,50 @@ export default function QuizPage({ params }: PageProps) {
       fetchQuizzes();
     }
   }, [id]);
+
+  useEffect(() => {
+    const fetchQuizAttempts = async () => {
+      const userId = getCookie("id");
+      if (!userId) {
+        setErrorAttempts("Vui lòng đăng nhập để xem lịch sử làm bài");
+        setLoadingAttempts(false);
+        return;
+      }
+
+      if (!id) {
+        setErrorAttempts("Không tìm thấy thông tin bài học");
+        setLoadingAttempts(false);
+        return;
+      }
+
+      try {
+        setLoadingAttempts(true);
+        setErrorAttempts(null);
+
+        const response = await get(`/client/quizz/getQuizzAttemp/${userId}/${id}`) as IApiResponse<QuizAttemptResponse[]>;
+        const { isSuccess, data, error: responseError } = handleResponse(response);
+
+        if (isSuccess && data) {
+          // BE đã trả về đúng format, không cần map lại
+          setAttempts(data);
+        } else {
+          const errorMessage = responseError?.message || "Không thể tải lịch sử làm bài";
+          setErrorAttempts(errorMessage);
+          console.error("Error fetching quiz attempts:", responseError);
+        }
+      } catch (err) {
+        const errorMessage = err instanceof Error ? err.message : "Có lỗi xảy ra khi tải lịch sử làm bài";
+        setErrorAttempts(errorMessage);
+        console.error("Error:", err);
+      } finally {
+        setLoadingAttempts(false);
+      }
+    };
+
+    if (activeTab === "attempts" && id) {
+      fetchQuizAttempts();
+    }
+  }, [activeTab, id]);
 
   return (
     <div className="min-h-screen bg-gray-50 p-6">
@@ -157,49 +199,65 @@ export default function QuizPage({ params }: PageProps) {
             </>
           ) : (
             // Tab 2: Lịch sử làm bài
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    STT
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Tên chủ đề
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Thời gian
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Hành động
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {attempts.map((attempt, index) => (
-                  <tr key={attempt.id}>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {index + 1}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {attempt.quizTitle}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {attempt.attemptDate}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm">
-                      <Link href={`/results/${attempt.id}`}>
-                        <button
-                          type="button"
-                          className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
-                        >
-                          Xem chi tiết
-                        </button>
-                      </Link>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+            <>
+              {loadingAttempts ? (
+                <div className="flex justify-center items-center min-h-[400px]">
+                  <p className="text-gray-600">Đang tải lịch sử làm bài...</p>
+                </div>
+              ) : errorAttempts ? (
+                <div className="flex justify-center items-center min-h-[400px]">
+                  <p className="text-red-600">Lỗi: {errorAttempts}</p>
+                </div>
+              ) : attempts.length === 0 ? (
+                <div className="flex justify-center items-center min-h-[400px]">
+                  <p className="text-gray-600">Chưa có lịch sử làm bài nào</p>
+                </div>
+              ) : (
+                <table className="min-w-full divide-y divide-gray-200">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        STT
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Tên chủ đề
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Thời gian
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Hành động
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-200">
+                    {attempts.map((attempt, index) => (
+                      <tr key={attempt.id}>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                          {index + 1}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                          {attempt.quizTitle}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                          {attempt.attemptDate}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm">
+                          <Link href={`/results/${attempt.id}`}>
+                            <button
+                              type="button"
+                              className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+                            >
+                              Xem chi tiết
+                            </button>
+                          </Link>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
+            </>
           )}
         </div>
       </div>
