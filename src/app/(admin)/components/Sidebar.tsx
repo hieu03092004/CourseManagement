@@ -14,7 +14,6 @@ import {
 } from '@mui/material';
 import {
     AppRegistration,
-    Apps,
     Construction,
     Home,
     MeetingRoom,
@@ -22,6 +21,7 @@ import {
 } from '@mui/icons-material';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useSelector } from 'react-redux';
 
 interface SidebarProps {
     open: boolean;
@@ -35,24 +35,40 @@ interface MenuItem {
     icon: React.ReactNode;
 }
 
+interface RootState {
+    roleReducer: string;
+}
+
 const drawerWidth = 300;
 
 const Sidebar: React.FC<SidebarProps> = ({ open, handleDrawerToggle, isMobile: propIsMobile }) => {
     const theme = useTheme();
     const pathname = usePathname();
+    const roleName = useSelector((state: RootState) => state.roleReducer);
+
+    // Debug roleName
+
 
     const isMobileDetected = useMediaQuery(theme.breakpoints.down('md'), { noSsr: true });
     const isMobile = propIsMobile !== undefined ? propIsMobile : isMobileDetected;
 
-    // Danh sách menu
-    const menuItems: MenuItem[] = [
+    // Danh sách menu đầy đủ
+    const allMenuItems: MenuItem[] = [
         { path: '/', label: 'Trang chủ', icon: <Home /> },
         { path: '/admin/orders', label: 'Đơn hàng', icon: <MeetingRoom /> },
         { path: '/admin/quizzles', label: 'Quizzles', icon: <Construction /> },
         { path: '/admin/accounts', label: 'Tài khoản', icon: <Person /> },
         { path: '/admin/course-video', label: 'Khoá học online', icon: <AppRegistration /> },
-        { path: '/course-zoom', label: 'Khoá học zoom', icon: <Apps /> },
     ];
+
+    // Filter menu items dựa trên roleName
+    const menuItems: MenuItem[] = roleName === "Instructor"
+        ? allMenuItems.filter(item => 
+            item.path !== '/admin/orders' && item.path !== '/admin/accounts'
+        )
+        : allMenuItems;
+
+    // Debug menu items
 
     // Style cho item đang được chọn
     const selectedItemStyle = {

@@ -54,6 +54,7 @@ export default function LoginPage() {
           email: string;
           fullName: string;
           phone: string;
+          roleId: number;
         };
         cartId?: number;
       }>;
@@ -63,11 +64,18 @@ export default function LoginPage() {
       // console.log("Response from BE:", { isSuccess, data, error });
       
       if (isSuccess && data) {
+        // Kiểm tra roleId
+        if (data.user.roleId !== 3) {
+          alert("Vai trò của bạn không hợp lệ");
+          return;
+        }
+        
         // Lưu thông tin user vào cookie
         setCookie("id", String(data.user.id), 1);
         setCookie("fullName", data.user.fullName, 1);
         setCookie("email", data.user.email, 1);
         setCookie("phone", data.user.phone || "", 1);
+        // setCookie("roleId", String(data.user.roleId), 1);
         setCookie("token", data.token, 1);
         
         // Lưu cartId vào cookie nếu có trong response
@@ -75,7 +83,7 @@ export default function LoginPage() {
           setCookie("cartId", String(data.cartId), 1);
         }
         
-        // // Dispatch action login
+        // Dispatch action login
         dispatch(checkLogin(true));
         
         // Chuyển hướng về trang chủ

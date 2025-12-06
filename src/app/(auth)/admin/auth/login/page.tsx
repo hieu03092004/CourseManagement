@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Box,
   Button,
@@ -13,6 +13,12 @@ import {
   CircularProgress,
 } from "@mui/material";
 import { useRouter } from "next/navigation";
+import { useDispatch } from "react-redux";
+import { post } from "@/app/(admin)/ultils/request";
+import { handleResponse } from "@/helpers/api/response/handleResponse";
+import { IApiResponse } from "@/helpers/api/response/IResponse";
+import { setCookie } from "@/app/(client)/helpers/cookie";
+import { getRole } from "@/app/(client)/actions";
 
 // Constants
 const LOGO_SIZE = 100;
@@ -33,10 +39,17 @@ const Login = () => {
   const [formData, setFormData] = useState<LoginFormData>(initialFormData);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [mounted, setMounted] = useState(false);
   const router = useRouter();
+  const dispatch = useDispatch();
 
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down("md"), { noSsr: true });
+  const isMobileQuery = useMediaQuery(theme.breakpoints.down("md"), { noSsr: true });
+  const isMobile = mounted ? isMobileQuery : false;
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -68,17 +81,56 @@ const Login = () => {
     setError(null);
 
     try {
-      // Temporary login success - navigate to dashboard
-      // TODO: Replace with actual API call
-      await new Promise((resolve) => setTimeout(resolve, 1000)); // Simulate API call
+      const requestData = {
+        email: formData.email,
+        password: formData.password,
+      };
 
-      // Mock successful login
-      router.push('/admin/dashboard');
+      const response = await post("/auth/login", requestData) as IApiResponse<{
+        message: string;
+        token: string;
+        user: {
+          id: number;
+          email: string;
+          fullName: string;
+          phone: string;
+          roleId: number;
+        };
+        cartId?: number;
+      }>;
+
+      const { isSuccess, data, error } = handleResponse(response);
+
+      if (isSuccess && data) {
+        // Kiểm tra roleId
+        if (data.user.roleId !== 1 && data.user.roleId !== 2) {
+          setError("Vai trò của bạn không hợp lệ");
+          setIsLoading(false);
+          return;
+        }
+
+        // Lưu thông tin user vào cookie
+        setCookie("id", String(data.user.id), 1);
+        setCookie("fullName", data.user.fullName, 1);
+        setCookie("email", data.user.email, 1);
+        setCookie("phone", data.user.phone || "", 1);
+        setCookie("roleId", String(data.user.roleId), 1);
+        setCookie("token", data.token, 1);
+
+        // Dispatch action getRole với roleId từ response
+        dispatch(getRole(data.user.roleId));
+
+        // Chuyển hướng về trang dashboard
+        router.push("/admin/dashboard");
+      } else {
+        const errorMessage = error?.message || "Đăng nhập thất bại!";
+        setError(errorMessage);
+      }
     } catch (error) {
       if (error instanceof Error) {
         setError(error.message);
       } else {
-        setError("Có lỗi xảy ra, vui lòng thử lại");
+        setError("Có lỗi xảy ra khi đăng nhập!");
       }
     } finally {
       setIsLoading(false);

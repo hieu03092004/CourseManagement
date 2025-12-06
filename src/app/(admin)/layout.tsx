@@ -1,16 +1,25 @@
 "use client";
 import React, { useState, useEffect } from 'react';
 import { Box, CssBaseline, Toolbar, useMediaQuery, useTheme } from '@mui/material';
+import { Provider } from "react-redux";
+import { createStore } from "redux";
+import { useDispatch } from "react-redux";
 import Navbar from './components/Navbar';
 import Sidebar from './components/Sidebar';
 import { AuthProvider } from './context/AuthContext';
+import allReducers from "../(client)/reducers";
+import { getRole } from "../(client)/actions";
+import { getCookie } from "../(client)/helpers/cookie";
 
 interface AdminLayoutProps {
     children: React.ReactNode;
 }
 
-const MainLayout: React.FC<AdminLayoutProps> = ({ children }) => {
+const store = createStore(allReducers);
+
+const AdminLayoutContent: React.FC<AdminLayoutProps> = ({ children }) => {
     const theme = useTheme();
+    const dispatch = useDispatch();
     // Check if the device is mobile (avoid SSR mismatch)
     const isMobile = useMediaQuery(theme.breakpoints.down('md'), { noSsr: true });
 
@@ -21,6 +30,17 @@ const MainLayout: React.FC<AdminLayoutProps> = ({ children }) => {
     useEffect(() => {
         setSidebarOpen(!isMobile);
     }, [isMobile]);
+
+    // Dispatch roleName dựa trên roleId từ cookie
+    useEffect(() => {
+        const roleId = getCookie("roleId");
+        if (roleId) {
+            const roleIdNumber = parseInt(roleId, 10);
+            if (roleIdNumber === 1 || roleIdNumber === 2) {
+                dispatch(getRole(roleIdNumber));
+            }
+        }
+    }, [dispatch]);
 
     // Hàm xử lý sự kiện toggle sidebar
     const handleDrawerToggle = () => {
@@ -61,6 +81,14 @@ const MainLayout: React.FC<AdminLayoutProps> = ({ children }) => {
                 </Box>
             </Box>
         </AuthProvider>
+    );
+};
+
+const MainLayout: React.FC<AdminLayoutProps> = ({ children }) => {
+    return (
+        <Provider store={store}>
+            <AdminLayoutContent>{children}</AdminLayoutContent>
+        </Provider>
     );
 };
 
