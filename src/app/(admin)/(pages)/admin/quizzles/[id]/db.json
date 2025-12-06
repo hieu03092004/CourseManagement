@@ -6,7 +6,7 @@
     "status": "active",
   "questions": [
     {
-        "questionId": 1,
+      "questionId": 1,
       "questionName": "HTML là viết tắt của...?",
       "answers": [
         {

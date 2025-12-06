@@ -32,6 +32,7 @@ export default function QuizzlesPage() {
       const { isSuccess, data, error } = handleResponse(response);
 
       if (isSuccess && data) {
+        console.log("Fetched quizzes:", data);
         setQuizzes(data);
         setFilteredQuizzes(data);
       } else {
@@ -60,7 +61,7 @@ export default function QuizzlesPage() {
     }
 
     if (courseFilter !== "all") {
-      result = result.filter((quiz) => quiz.courseName === courseFilter);
+      result = result.filter((quiz) => quiz.quizName === courseFilter);
     }
 
     if (statusFilter !== "all") {
@@ -70,10 +71,6 @@ export default function QuizzlesPage() {
     setFilteredQuizzes(result);
     setPage(0);
   }, [quizzes, searchTerm, courseFilter, statusFilter]);
-
-  const uniqueCourses = Array.from(
-    new Set(quizzes.map((quiz) => quiz.courseName))
-  );
 
   const handleViewDetails = (quiz: Quiz) => {
     router.push(`/admin/quizzles/${quiz.id}`);
@@ -138,7 +135,7 @@ export default function QuizzlesPage() {
         onCourseFilterChange={setCourseFilter}
         statusFilter={statusFilter}
         onStatusFilterChange={setStatusFilter}
-        courses={uniqueCourses}
+        courses={quizzes}
       />
 
       <Table

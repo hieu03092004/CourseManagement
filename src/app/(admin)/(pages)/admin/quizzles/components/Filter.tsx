@@ -9,6 +9,12 @@ import {
   Stack,
 } from "@mui/material";
 
+type CourseItem = {
+  id: string;
+  quizName: string;
+  [key: string]: any;
+};
+
 interface FilterProps {
   searchTerm: string;
   onSearchChange: (value: string) => void;
@@ -16,7 +22,7 @@ interface FilterProps {
   onCourseFilterChange: (value: string) => void;
   statusFilter: string;
   onStatusFilterChange: (value: string) => void;
-  courses: string[];
+  courses: CourseItem[];
 }
 
 const Filter: React.FC<FilterProps> = ({
@@ -40,16 +46,19 @@ const Filter: React.FC<FilterProps> = ({
           sx={{ flex: 1, minWidth: 200 }}
         />
         <FormControl size="small" sx={{ minWidth: 200 }}>
-          <InputLabel>Khóa học</InputLabel>
+          <InputLabel>Quiz</InputLabel>
           <Select
             value={courseFilter}
             label="Khóa học"
-            onChange={(e) => onCourseFilterChange(e.target.value)}
+            onChange={(e) => onCourseFilterChange(e.target.value as string)}
           >
             <MenuItem value="all">Tất cả</MenuItem>
             {courses.map((course) => (
-              <MenuItem key={course} value={course}>
-                {course}
+              <MenuItem
+                key={course.id ?? course.quizName}
+                value={course.quizName}
+              >
+                {course.quizName}
               </MenuItem>
             ))}
           </Select>
