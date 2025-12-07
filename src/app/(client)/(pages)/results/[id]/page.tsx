@@ -13,7 +13,6 @@ interface Answer {
 }
 
 interface AnswerData {
-  userId: number;
   quizId: number;
   answers: Answer[];
   quizAttemptId: number;
@@ -41,7 +40,6 @@ export default function ResultPage({ params }: PageProps) {
     const fetchApi = async () => {
       // Mock data - getAnswer
       const dataAnswer: AnswerData = {
-        userId: 5,
         quizId: 1,
         answers: [
           { questionId: 1, userAnswer: 1 },

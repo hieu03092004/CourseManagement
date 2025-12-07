@@ -1,8 +1,10 @@
 "use client";
 import { use, useState, useEffect, useRef } from "react";
-import { get } from "@/app/(admin)/ultils/request";
+import { useRouter } from "next/navigation";
+import { get, post } from "@/app/(admin)/ultils/request";
 import { handleResponse } from "@/helpers/api/response/handleResponse";
 import { IApiResponse } from "@/helpers/api/response/IResponse";
+import { getCookie } from "@/app/(client)/helpers/cookie";
 
 interface PageProps {
   params: Promise<{
@@ -21,14 +23,21 @@ interface QuizData {
   questions: Question[];
 }
 
+interface CreateAttemptResponse {
+  message: string;
+  quizAttemptId: number;
+}
+
 export default function QuestionsPage({ params }: PageProps) {
   const { id } = use(params);
+  const router = useRouter();
   const [questions, setQuestions] = useState<Question[]>([]);
   const [selectedAnswers, setSelectedAnswers] = useState<{
     [key: number]: number;
   }>({});
   const [timeLeft, setTimeLeft] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const submitButtonRef = useRef<HTMLButtonElement>(null);
 
@@ -97,30 +106,58 @@ export default function QuestionsPage({ params }: PageProps) {
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Format data theo cấu trúc backend
-    const payload = {
-      quizId: parseInt(id),
-      userId: 1, // Fix cứng userId = 1
-      answers: Object.entries(selectedAnswers).map(([questionId, choice]) => ({
-        questionId: parseInt(questionId),
-        choice: choice,
-      })),
-    };
+    // Lấy userId từ cookie
+    const userIdStr = getCookie("id");
+    if (!userIdStr) {
+      alert("Vui lòng đăng nhập để nộp bài!");
+      return;
+    }
 
-    console.log("Payload JSON:");
-    console.log(JSON.stringify(payload, null, 2));
+    const userId = parseInt(userIdStr, 10);
+    if (isNaN(userId)) {
+      alert("Thông tin người dùng không hợp lệ!");
+      return;
+    }
 
-    // TODO: Gửi lên backend
-    // const response = await fetch(`http://localhost:3002/quiz-results`, {
-    //   method: "POST",
-    //   headers: { "Content-Type": "application/json" },
-    //   body: JSON.stringify(payload),
-    // });
+    setIsSubmitting(true);
+    setError(null);
 
-    alert("Đã nộp bài!");
+    try {
+      // Format data theo cấu trúc backend
+      const payload = {
+        quizId: parseInt(id),
+        userId: userId,
+        answers: Object.entries(selectedAnswers).map(([questionId, choice]) => ({
+          questionId: parseInt(questionId),
+          choice: choice,
+        })),
+      };
+
+      const response = await post(
+        "/client/quizz/createattemp",
+        payload
+      ) as IApiResponse<CreateAttemptResponse>;
+
+      const { isSuccess, data, error: responseError } = handleResponse(response);
+      if (isSuccess && data) {
+        // Chuyển hướng sang trang results với quizAttemptId
+        router.push(`/results/${data.quizAttemptId}`);
+      } else {
+        const errorMessage = responseError?.message || "Có lỗi xảy ra khi nộp bài!";
+        setError(errorMessage);
+        alert(errorMessage);
+      }
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : "Có lỗi xảy ra khi nộp bài!";
+      setError(errorMessage);
+      alert(errorMessage);
+      console.error("Error submitting quiz:", err);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   if (loading) {
@@ -220,9 +257,10 @@ export default function QuestionsPage({ params }: PageProps) {
               <button
                 ref={submitButtonRef}
                 type="submit"
-                className="px-8 py-3 bg-blue-500 text-white font-semibold rounded-lg hover:bg-blue-600 transition-colors shadow-md"
+                disabled={isSubmitting}
+                className="px-8 py-3 bg-blue-500 text-white font-semibold rounded-lg hover:bg-blue-600 transition-colors shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Nộp bài
+                {isSubmitting ? "Đang nộp bài..." : "Nộp bài"}
               </button>
             </div>
           </form>
